@@ -1,16 +1,11 @@
-# Local dev: build WITHOUT downloading weights into the image, and bind-mount
-# ./models so weights download once to a visible host folder (persists across
-# restarts; no rebuild).
 services:
   app:
     build:
       context: .
       args:
-        DOWNLOAD_WEIGHTS: "false"
+        DOWNLOAD_WEIGHTS: "true"
     ports:
       - "8000:8000"
     environment:
       HF_HOME: /app/models
       FRONTEND_DIST: /app/frontend_dist
-    volumes:
-      - ./models:/app/models

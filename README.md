@@ -40,7 +40,8 @@ docker run --rm -p 8000:8000 tnqeet-app
 # open http://localhost:8000
 ```
 
-Local dev via compose (weights download once to ./models, not baked):
+Run via compose (mirrors Railway: the build downloads all weights into the image,
+no volume needed):
 ```bash
 docker compose up --build
 ```
