@@ -219,10 +219,17 @@ i18n via a small custom `en`/`ar` dictionary + context (no heavy library).
 5. (≈37 words) `تُعد اللغة العربية من أقدم اللغات التي ما زالت حية إلى اليوم، فهي لغة القرآن الكريم ووعاء الحضارة الإسلامية، وقد حافظت على بنيتها وقواعدها رغم مرور القرون الطويلة، وأسهمت في نقل العلوم والمعارف إلى مختلف أنحاء العالم`
 6. (≈46 words) `عندما تغرب الشمس خلف الجبال البعيدة، تتحول السماء إلى لوحة فنية بديعة تمتزج فيها ألوان الذهب والأرجوان، ويعود الفلاحون من حقولهم بعد يوم طويل من العمل الشاق، حاملين معهم ثمار جهدهم، بينما تتعالى أصوات العصافير وهي تبحث عن أعشاشها قبل أن يحل الظلام على القرية الهادئة`
 7. (≈41 words) `يحرص المعلم الناجح على تنويع أساليب التدريس داخل الفصل، فيمزج بين الشرح النظري والتطبيق العملي، ويشجع طلابه على طرح الأسئلة والمشاركة في النقاش، لأنه يؤمن بأن التعليم الحقيقي لا يكون بالتلقين وحده، بل ببناء عقول قادرة على التفكير والإبداع وحل المشكلات`
+8. (Wikipedia style, ≈34 words) `دمشق هي عاصمة الجمهورية العربية السورية وكبرى مدنها، وتعد من أقدم المدن المأهولة باستمرار في العالم، إذ يعود تاريخ استيطانها إلى آلاف السنين، وقد كانت عاصمة الدولة الأموية ومركزا تجاريا وثقافيا مهما عبر العصور`
+9. (poetry — Ahmad Shawqi) `قم للمعلم وفه التبجيلا، كاد المعلم أن يكون رسولا`
+10. (poetry — Al-Mutanabbi) `الخيل والليل والبيداء تعرفني، والسيف والرمح والقرطاس والقلم`
 
-**Examples rendering:** short examples (1–3) render as inline chips; the long ones (4–7)
-render as a stacked list, **truncated with an ellipsis**, and load their full text into the
-textbox on click.
+All text is plain letters (no harakat), matching tnqeet's letter-dot removal. Poetry verses
+are public domain. Attribution (poet name) shown as an optional small caption is a nice-to-have,
+not required.
+
+**Examples rendering:** short examples (1–3, 9–10) render as inline chips; the long ones
+(4–8) render as a stacked list, **truncated with an ellipsis**, and load their full text into
+the textbox on click.
 
 ## 9. Packaging & Deployment
 
