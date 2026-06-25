@@ -33,7 +33,7 @@ export function LangToggle() {
       />
       {option("en", "EN")}
       {/* nudge the Arabic glyph up to sit on the same optical line as EN */}
-      {option("ar", <span className="relative -top-0.5">ع</span>)}
+      {option("ar", <span className="relative -top-1">ع</span>)}
     </div>
   );
 }
