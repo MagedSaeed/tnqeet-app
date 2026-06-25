@@ -31,6 +31,7 @@ export interface Dict {
   errorDetails: string;
   close: string;
   dotsWarning: string;
+  toggleHighlight: string;
 }
 
 export const en: Dict = {
@@ -67,6 +68,7 @@ export const en: Dict = {
   errorGeneric: "Something went wrong. Please try again.",
   errorDetails: "Error details",
   close: "Close",
+  toggleHighlight: "Show/hide dots color highlighting",
   dotsWarning:
     "Your text still has dots. Restoration is meant for dotless rasm — use “Remove dots” first to see the effect. (The server removes them anyway before restoring.)",
 };

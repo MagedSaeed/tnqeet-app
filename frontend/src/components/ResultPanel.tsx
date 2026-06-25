@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useI18n } from "../i18n";
 import { useDismiss } from "../hooks/useDismiss";
 import { DiffText } from "./DiffText";
-import { CopyIcon, CheckIcon, CloseIcon } from "./icons";
+import { CopyIcon, CheckIcon, CloseIcon, DotsIcon } from "./icons";
 
 interface Props {
   input: string;
@@ -14,6 +14,7 @@ interface Props {
 export function ResultPanel({ input, text, methodLabel, onClose }: Props) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
+  const [highlight, setHighlight] = useState(true);
   const { ref, dismiss, onTransitionEnd, className } = useDismiss(onClose);
 
   const copy = async () => {
@@ -29,9 +30,22 @@ export function ResultPanel({ input, text, methodLabel, onClose }: Props) {
       className={`${className} mt-5 overflow-hidden rounded-2xl border border-line bg-surface`}
     >
       <div className="flex items-center justify-between gap-3 border-b border-line bg-paper/50 px-5 py-2.5">
-        <span className="font-mono text-[0.72rem] uppercase tracking-wider text-muted">
-          {methodLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setHighlight((h) => !h)}
+            aria-label={t.toggleHighlight}
+            aria-pressed={highlight}
+            title={t.toggleHighlight}
+            className={`rounded p-0.5 transition ${
+              highlight ? "text-accent" : "text-muted/40 hover:text-muted"
+            }`}
+          >
+            <DotsIcon />
+          </button>
+          <span className="font-mono text-[0.72rem] uppercase tracking-wider text-muted">
+            {methodLabel}
+          </span>
+        </div>
         <div className="flex items-center gap-3">
           <button
             onClick={copy}
@@ -54,6 +68,7 @@ export function ResultPanel({ input, text, methodLabel, onClose }: Props) {
       <DiffText
         input={input}
         output={text}
+        highlight={highlight}
         className="p-5 font-arabic text-[1.05rem] leading-[1.8] text-ink"
       />
     </div>
