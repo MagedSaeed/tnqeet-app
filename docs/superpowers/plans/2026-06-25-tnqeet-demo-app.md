@@ -1885,7 +1885,7 @@ git commit -m "feat(frontend): MethodTabs + ResultPanel"
 ```tsx
 import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "../i18n";
-import { KEYS, loadJSON, saveJSON } from "../lib/storage";
+import { KEYS, saveJSON } from "../lib/storage";
 import { fetchModels, filterModels, type ORModel } from "../lib/openrouter";
 
 interface Props {
