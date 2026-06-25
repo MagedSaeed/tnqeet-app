@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "../i18n";
 import { KEYS, saveJSON } from "../lib/storage";
 import { fetchModels, filterModels, type ORModel } from "../lib/openrouter";
+import { btnPrimary, btnGhost, btnDanger } from "../lib/ui";
 
 interface Props {
   apiKey: string;
@@ -71,17 +72,10 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
                 onChange={(e) => setDraftKey(e.target.value)}
                 className={`flex-1 font-mono ${field}`}
               />
-              <button
-                onClick={() => setShowKey((s) => !s)}
-                className="rounded-lg border border-line px-3 text-sm text-muted transition hover:text-ink"
-              >
+              <button onClick={() => setShowKey((s) => !s)} className={btnGhost}>
                 {showKey ? t.hide : t.show}
               </button>
-              <button
-                onClick={saveKey}
-                disabled={!draftKey}
-                className="rounded-lg bg-accent px-4 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
-              >
+              <button onClick={saveKey} disabled={!draftKey} className={btnPrimary}>
                 {t.save}
               </button>
             </div>
@@ -112,14 +106,11 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
                 setDraftKey(apiKey);
                 setEditingKey(true);
               }}
-              className="rounded-lg border border-line px-3 py-1 text-sm text-muted transition hover:text-ink"
+              className={btnGhost}
             >
               {t.edit}
             </button>
-            <button
-              onClick={deleteKey}
-              className="rounded-lg border border-accent/50 px-3 py-1 text-sm text-accent transition hover:bg-accent/10"
-            >
+            <button onClick={deleteKey} className={btnDanger}>
               {t.delete}
             </button>
           </div>

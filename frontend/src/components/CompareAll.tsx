@@ -3,6 +3,7 @@ import { useI18n } from "../i18n";
 import type { MethodInfo } from "../lib/api";
 import { restoreDots } from "../lib/api";
 import { DiffText } from "./DiffText";
+import { btnPrimary } from "../lib/ui";
 
 interface Props {
   text: string;
@@ -61,12 +62,7 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
           <span className="font-mono text-muted">{open ? "–" : "+"}</span> {t.compareAll}
         </button>
         {open && (
-          <button
-            onClick={runAll}
-            disabled={running || !text.trim()}
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+          <button onClick={runAll} disabled={running || !text.trim()} className={btnPrimary}>
             {t.runAll}
           </button>
         )}

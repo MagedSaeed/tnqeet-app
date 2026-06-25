@@ -10,6 +10,7 @@ import { CompareAll } from "./components/CompareAll";
 import { LlmPanel } from "./components/LlmPanel";
 import { getMethods, removeDots, restoreDots, type MethodInfo } from "./lib/api";
 import { KEYS, loadJSON } from "./lib/storage";
+import { btnPrimary } from "./lib/ui";
 import { EXAMPLES } from "./data/examples";
 
 function Inner() {
@@ -110,12 +111,7 @@ function Inner() {
             )}
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button
-                onClick={onRestore}
-                disabled={restoreDisabled}
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+              <button onClick={onRestore} disabled={restoreDisabled} className={btnPrimary}>
                 {t.restore}
               </button>
               {active === "llm" && !apiKey && (
