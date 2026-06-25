@@ -15,7 +15,7 @@ BAKED_MODELS = {
 }
 
 # Max characters accepted by remove-dots / restore-dots (bounds request cost).
-MAX_INPUT_CHARS = int(os.getenv("TNQEET_MAX_INPUT_CHARS", "5000"))
+MAX_INPUT_CHARS = int(os.getenv("TNQEET_MAX_INPUT_CHARS", str(4096 * 2)))  # 8192
 
 # Max number of neural/n-gram models kept resident in memory at once (LRU).
 # Keep small on memory-constrained hosts (e.g. Railway) to avoid OOM.

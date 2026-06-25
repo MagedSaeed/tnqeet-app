@@ -56,7 +56,7 @@ network I/O for weights. Healthcheck path: `/api/health`.
 
 | Var | Default | Meaning |
 |---|---|---|
-| `TNQEET_MAX_INPUT_CHARS` | 5000 | Max input length |
+| `TNQEET_MAX_INPUT_CHARS` | 8192 | Max input length |
 | `TNQEET_MAX_RESIDENT_MODELS` | 2 | Models kept in memory (LRU) |
 | `TNQEET_LSTM_SIZE` / `TNQEET_TRANSFORMER_SIZE` / `TNQEET_CANINE_SIZE` / `TNQEET_NGRAM_ORDER` | 6L / 12L / c / 8 | Baked model variants |
 | `TNQEET_DEFAULT_LLM_MODEL` | anthropic/claude-sonnet-4 | LLM default model |
