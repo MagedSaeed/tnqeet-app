@@ -903,10 +903,10 @@ git commit -m "feat(backend): weight-download script for Docker build"
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -939,7 +939,6 @@ git commit -m "feat(backend): weight-download script for Docker build"
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
@@ -1189,8 +1188,23 @@ git commit -m "feat(frontend): storage helpers + language detection (TDD)"
 
 - [ ] **Step 1: Write `frontend/src/i18n/en.ts`**
 
+Note: `Dict` is declared as an explicit `interface` (with `string` fields), NOT
+`as const` + `typeof en` — otherwise the keys become narrow literal types and the
+Arabic dictionary (`ar: Dict`) fails to typecheck.
+
 ```ts
-export const en = {
+export interface Dict {
+  title: string; subtitle: string; description: string; yourText: string;
+  removeDots: string; ruleBased: string; restore: string; examples: string;
+  result: string; copy: string; copied: string; compareAll: string;
+  runAll: string; unavailable: string; llmKeyLabel: string;
+  llmKeyPlaceholder: string; llmKeyNote: string; inBrowserOnly: string;
+  save: string; show: string; hide: string; edit: string; delete: string;
+  getKey: string; modelLabel: string; modelPlaceholder: string; selected: string;
+  enterKeyFirst: string; modelNote: string; packageWord: string; errorGeneric: string;
+}
+
+export const en: Dict = {
   title: "tnqeet",
   subtitle: "Arabic Rasm dot restoration",
   description:
@@ -1224,9 +1238,7 @@ export const en = {
   modelNote: "tnqeet supports additional sizes/variants — they're omitted here for performance and convenience. See the",
   packageWord: "package",
   errorGeneric: "Something went wrong. Please try again.",
-} as const;
-
-export type Dict = typeof en;
+};
 ```
 
 - [ ] **Step 2: Write `frontend/src/i18n/ar.ts`**
