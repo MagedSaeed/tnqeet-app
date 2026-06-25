@@ -27,12 +27,15 @@ function Inner() {
   const [model, setModel] = useState(loadJSON<string>(KEYS.model, ""));
 
   useEffect(() => {
+    // Fetch the method catalog once on mount. `t.errorGeneric` is intentionally
+    // NOT a dependency — including it would re-fetch on every language switch.
     getMethods().then((m) => {
       setMethods(m);
       const firstAvailable = m.find((x) => x.available);
       if (firstAvailable) setActive(firstAvailable.id);
     }).catch(() => setError(t.errorGeneric));
-  }, [t.errorGeneric]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeMethod = methods.find((m) => m.id === active);
 

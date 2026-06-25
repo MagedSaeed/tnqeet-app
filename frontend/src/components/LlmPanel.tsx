@@ -91,9 +91,10 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
               <div
                 key={m.id}
                 onClick={() => { saveJSON(KEYS.model, m.id); onChangeModel(m.id); setQuery(""); }}
-                className="cursor-pointer px-3 py-2 text-sm hover:bg-indigo-500/10"
+                className="flex cursor-pointer justify-between gap-3 px-3 py-2 text-sm hover:bg-indigo-500/10"
               >
                 <span className="font-mono opacity-85">{m.id}</span>
+                {m.name && m.name !== m.id && <span className="opacity-50">{m.name}</span>}
               </div>
             ))}
           </div>
