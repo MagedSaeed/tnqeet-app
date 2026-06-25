@@ -6,7 +6,20 @@ export interface MethodInfo {
 }
 
 interface ApiError {
-  error: { code: string; message: string };
+  error: { code: string; message: string; detail?: string };
+}
+
+// Error carrying an optional upstream `detail` (e.g. the raw provider error),
+// so the UI can surface it in a collapsible box.
+export class RequestError extends Error {
+  detail?: string;
+  status: number;
+  constructor(message: string, status: number, detail?: string) {
+    super(message);
+    this.name = "RequestError";
+    this.status = status;
+    this.detail = detail;
+  }
 }
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
@@ -17,13 +30,15 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
   });
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
+    let detail: string | undefined;
     try {
       const err = (await res.json()) as ApiError;
       message = err.error?.message ?? message;
+      detail = err.error?.detail;
     } catch {
       /* keep default */
     }
-    throw new Error(message);
+    throw new RequestError(message, res.status, detail);
   }
   return (await res.json()) as T;
 }

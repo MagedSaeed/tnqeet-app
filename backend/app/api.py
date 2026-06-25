@@ -1,4 +1,6 @@
 """API routes: health, methods catalog, remove-dots, restore-dots."""
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from . import config, dotters
@@ -10,7 +12,26 @@ from .schemas import (
     TextResponse,
 )
 
+log = logging.getLogger("tnqeet.api")
+
 router = APIRouter(prefix="/api")
+
+
+def _error_detail(exc: Exception) -> str:
+    """A concise, UI-safe description of an upstream failure.
+
+    dspy wraps the real cause after an 'Original error:' marker; keep only that
+    tail. Provider error pages can be huge HTML — replace those with a short
+    note, and cap everything else so the client never receives a wall of text.
+    """
+    msg = str(exc).strip()
+    marker = "Original error:"
+    if marker in msg:
+        msg = msg.split(marker, 1)[1].strip()
+    lowered = msg.lower()
+    if "<html" in lowered or "<!doctype" in lowered:
+        return "The upstream provider returned an HTML error page instead of JSON."
+    return msg[:1000]
 
 
 def _check_len(text: str) -> None:
@@ -63,9 +84,15 @@ def restore_dots(req: RestoreDotsRequest):
         raise HTTPException(
             status_code=400, detail={"code": "bad_request", "message": str(exc)}
         )
-    except Exception:  # upstream/model failure (e.g. OpenRouter)
+    except Exception as exc:  # upstream/model failure (e.g. OpenRouter)
+        # Log the full cause server-side; return a concise detail to the client.
+        log.exception("restore-dots failed (method=%s, model=%s)", req.method, req.model)
         raise HTTPException(
             status_code=502,
-            detail={"code": "restore_failed", "message": "Restoration failed."},
+            detail={
+                "code": "restore_failed",
+                "message": "Restoration failed.",
+                "detail": _error_detail(exc),
+            },
         )
     return {"text": text, "method": req.method}

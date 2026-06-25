@@ -33,6 +33,7 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
   const [showKey, setShowKey] = useState(false);
   const [models, setModels] = useState<ORModel[]>([]);
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     fetchModels().then(setModels).catch(() => setModels([]));
@@ -118,31 +119,48 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
       </div>
 
       {/* Model search */}
-      <div>
+      <div
+        className="relative"
+        onBlur={(e) => {
+          // Close only when focus leaves the whole combobox (not when moving
+          // from the input to a list item).
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
+        }}
+      >
         <span className={label}>{t.modelLabel}</span>
         <input
           value={query}
           placeholder={t.modelPlaceholder}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          role="combobox"
+          aria-expanded={open}
           className={`w-full ${field} focus:border-accent`}
         />
-        {query && (
-          <div className="mt-1.5 max-h-44 overflow-auto rounded-lg border border-line">
+        {open && filtered.length > 0 && (
+          <div className="absolute z-10 mt-1.5 max-h-44 w-full overflow-auto rounded-lg border border-line bg-paper shadow-lg">
             {filtered.map((m) => (
-              <div
+              <button
                 key={m.id}
+                type="button"
                 onClick={() => {
                   saveJSON(KEYS.model, m.id);
                   onChangeModel(m.id);
                   setQuery("");
+                  setOpen(false);
                 }}
-                className="flex cursor-pointer justify-between gap-3 px-3 py-2 text-sm transition hover:bg-accent/10"
+                className="flex w-full cursor-pointer flex-col gap-0.5 border-b border-line/40 px-3 py-2 text-start transition last:border-b-0 hover:bg-accent/10"
               >
-                <span className="font-mono">{highlight(m.id, query)}</span>
+                <span className="text-sm text-ink">
+                  {m.name && m.name !== m.id ? highlight(m.name, query) : highlight(m.id, query)}
+                </span>
                 {m.name && m.name !== m.id && (
-                  <span className="text-muted">{highlight(m.name, query)}</span>
+                  <span className="font-mono text-xs text-muted">{highlight(m.id, query)}</span>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         )}

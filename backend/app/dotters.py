@@ -13,7 +13,7 @@ METHODS = [
     {"id": "lstm", "label": "LSTM", "requiresKey": False},
     {"id": "transformer", "label": "Transformer", "requiresKey": False},
     {"id": "canine", "label": "CANINE", "requiresKey": False},
-    {"id": "llm", "label": "LLM", "requiresKey": True},
+    {"id": "llm", "label": "LLMs", "requiresKey": True},
 ]
 METHOD_IDS = {m["id"] for m in METHODS}
 
@@ -87,6 +87,18 @@ def _get_or_load(method_id: str):
         return _cache[method_id]
 
 
+def _openrouter_model(model: str) -> str:
+    """Ensure `model` is routed through OpenRouter by litellm.
+
+    litellm picks the provider from the leading path segment, so an OpenRouter
+    model id like 'anthropic/claude-sonnet-4.5' is otherwise sent to the *native*
+    Anthropic provider — which, against the OpenRouter api_base, hits a bad path
+    and returns an HTML 404 (litellm.NotFoundError) that surfaced as a 502.
+    Prefixing 'openrouter/' makes litellm use its OpenRouter handler.
+    """
+    return model if model.startswith("openrouter/") else f"openrouter/{model}"
+
+
 def _make_llm_dotter(api_key: str, model: str):
     """Construct an OpenRouter LLM dotter. Not cached — key is per-request."""
     from tnqeet.dotting_models.llms.models import OpenRouterArabicDotter # type: ignore
@@ -103,7 +115,7 @@ def restore(method_id: str, text: str, model: str | None = None,
     if method_id == "llm":
         if not api_key:
             raise ValueError("API key required for the LLM method")
-        chosen = model or config.DEFAULT_LLM_MODEL
+        chosen = _openrouter_model(model or config.DEFAULT_LLM_MODEL)
         # dspy.configure is process-global inside the dotter; serialize LLM calls.
         with _lock:
             dotter = _make_llm_dotter(api_key, chosen)

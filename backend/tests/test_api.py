@@ -52,3 +52,25 @@ def test_restore_llm_without_key_is_400(monkeypatch):
     r = client.post("/api/restore-dots", json={"text": "rasm", "method": "llm"})
     assert r.status_code == 400
     assert r.json()["error"]["code"] == "bad_request"
+
+
+def test_restore_failure_returns_502_with_detail(monkeypatch):
+    monkeypatch.setattr(dotters, "is_available", lambda m: True)
+
+    def boom(*a, **k):
+        raise RuntimeError("dspy failed. Original error: <html>oops</html>")
+
+    monkeypatch.setattr(dotters, "restore", boom)
+    r = client.post("/api/restore-dots", json={"text": "rasm", "method": "lstm"})
+    assert r.status_code == 502
+    err = r.json()["error"]
+    assert err["code"] == "restore_failed"
+    # HTML pages are replaced with a short note rather than dumped to the client.
+    assert "HTML" in err["detail"]
+
+
+def test_error_detail_keeps_only_original_error_tail():
+    from app.api import _error_detail
+
+    detail = _error_detail(RuntimeError("wrapper noise Original error: real cause here"))
+    assert detail == "real cause here"

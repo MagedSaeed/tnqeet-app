@@ -8,7 +8,10 @@ import { MethodTabs } from "./components/MethodTabs";
 import { ResultPanel } from "./components/ResultPanel";
 import { CompareAll } from "./components/CompareAll";
 import { LlmPanel } from "./components/LlmPanel";
-import { getMethods, removeDots, restoreDots, type MethodInfo } from "./lib/api";
+import { ErrorBox } from "./components/ErrorBox";
+import { WarningBox } from "./components/WarningBox";
+import { getMethods, removeDots, restoreDots, RequestError, type MethodInfo } from "./lib/api";
+import { hasDots } from "./lib/arabic";
 import { KEYS, loadJSON } from "./lib/storage";
 import { btnPrimaryHero } from "./lib/ui";
 import { DotsIcon, Spinner } from "./components/icons";
@@ -19,12 +22,15 @@ function Inner() {
   const { theme, toggle } = useTheme();
 
   const [methods, setMethods] = useState<MethodInfo[]>([]);
-  const [active, setActive] = useState("ngram");
+  const [active, setActive] = useState("transformer");
   const [text, setText] = useState(EXAMPLES[0].text);
   const [result, setResult] = useState<{ input: string; text: string; label: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [restoring, setRestoring] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
+  // Shown only after Restore is clicked while the text still has dots (i.e. the
+  // user skipped "Remove dots"). Dismissible; cleared once dots are removed.
+  const [showDotsWarning, setShowDotsWarning] = useState(false);
 
   const [apiKey, setApiKey] = useState(loadJSON<string>(KEYS.apiKey, ""));
   const [model, setModel] = useState(loadJSON<string>(KEYS.model, ""));
@@ -35,31 +41,42 @@ function Inner() {
     getMethods()
       .then((m) => {
         setMethods(m);
-        const firstAvailable = m.find((x) => x.available);
-        if (firstAvailable) setActive(firstAvailable.id);
+        // Prefer the transformer; fall back to the first available method.
+        const preferred =
+          m.find((x) => x.id === "transformer" && x.available) ?? m.find((x) => x.available);
+        if (preferred) setActive(preferred.id);
       })
-      .catch(() => setError(t.errorGeneric));
+      .catch(() => setError({ message: t.errorGeneric }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const activeMethod = methods.find((m) => m.id === active);
 
+  const toError = (e: unknown) => ({
+    message: (e as Error).message,
+    detail: e instanceof RequestError ? e.detail : undefined,
+  });
+
   const onRemoveDots = async () => {
-    setError("");
+    setError(null);
+    setShowDotsWarning(false);
     setBusy(true);
     try {
       const r = await removeDots(text);
       setText(r.text);
       setResult(null);
     } catch (e) {
-      setError((e as Error).message);
+      setError(toError(e));
     } finally {
       setBusy(false);
     }
   };
 
   const onRestore = async () => {
-    setError("");
+    setError(null);
+    // Restoration expects dotless rasm; warn if the user skipped removal. The
+    // server undots anyway, so we still proceed.
+    setShowDotsWarning(hasDots(text));
     setBusy(true);
     setRestoring(true);
     const sent = text;
@@ -72,7 +89,7 @@ function Inner() {
       });
       setResult({ input: sent, text: r.text, label: activeMethod?.label ?? active });
     } catch (e) {
-      setError((e as Error).message);
+      setError(toError(e));
     } finally {
       setBusy(false);
       setRestoring(false);
@@ -116,7 +133,10 @@ function Inner() {
             </p>
           )}
 
-          <div className="mt-6 flex flex-col items-center gap-2">
+          <div className="mt-6 flex flex-col items-center gap-3">
+            {showDotsWarning && (
+              <WarningBox message={t.dotsWarning} onClose={() => setShowDotsWarning(false)} />
+            )}
             <button onClick={onRestore} disabled={restoreDisabled} className={btnPrimaryHero}>
               {restoring ? <Spinner /> : <DotsIcon />}
               {t.restore}
@@ -127,9 +147,16 @@ function Inner() {
           </div>
         </section>
 
-        {error && <p className="mt-4 text-sm text-accent">{error}</p>}
+        {error && (
+          <ErrorBox message={error.message} detail={error.detail} onClose={() => setError(null)} />
+        )}
         {result && (
-          <ResultPanel input={result.input} text={result.text} methodLabel={result.label} />
+          <ResultPanel
+            input={result.input}
+            text={result.text}
+            methodLabel={result.label}
+            onClose={() => setResult(null)}
+          />
         )}
 
         <CompareAll text={text} methods={methods} apiKey={apiKey} model={model} />

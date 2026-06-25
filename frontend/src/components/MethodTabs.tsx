@@ -31,7 +31,6 @@ export function MethodTabs({ methods, active, onSelect }: Props) {
             ].join(" ")}
           >
             {m.label}
-            {m.requiresKey && <span className="ms-1 align-text-top text-[0.6rem]">🔒</span>}
           </button>
         );
       })}

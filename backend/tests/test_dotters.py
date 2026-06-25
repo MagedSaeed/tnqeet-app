@@ -77,5 +77,14 @@ def test_restore_llm_uses_key_and_model(monkeypatch):
 
     import app.dotters as d
     monkeypatch.setattr(d, "_make_llm_dotter", lambda api_key, model: FakeLLM(api_key=api_key, model=model))
-    assert d.restore("llm", "rasm", model="a/b", api_key="sk-or-123") == "ok"
-    assert captured == {"api_key": "sk-or-123", "model": "a/b"}
+    assert d.restore("llm", "rasm", model="anthropic/claude-sonnet-4.5", api_key="sk-or-123") == "ok"
+    # litellm must route via OpenRouter, so the model id is prefixed.
+    assert captured == {"api_key": "sk-or-123", "model": "openrouter/anthropic/claude-sonnet-4.5"}
+
+
+def test_openrouter_model_prefixes_and_is_idempotent():
+    assert dotters._openrouter_model("anthropic/claude-sonnet-4.5") == (
+        "openrouter/anthropic/claude-sonnet-4.5"
+    )
+    # already-prefixed ids are left untouched (no double prefix)
+    assert dotters._openrouter_model("openrouter/openai/gpt-4o") == "openrouter/openai/gpt-4o"

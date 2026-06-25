@@ -28,6 +28,9 @@ export interface Dict {
   modelNote: string;
   packageWord: string;
   errorGeneric: string;
+  errorDetails: string;
+  close: string;
+  dotsWarning: string;
 }
 
 export const en: Dict = {
@@ -62,4 +65,8 @@ export const en: Dict = {
   modelNote: "tnqeet has more sizes/variants, omitted here for brevity. See the",
   packageWord: "package",
   errorGeneric: "Something went wrong. Please try again.",
+  errorDetails: "Error details",
+  close: "Close",
+  dotsWarning:
+    "Your text still has dots. Restoration is meant for dotless rasm — use “Remove dots” first to see the effect. (The server removes them anyway before restoring.)",
 };

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { filterModels, type ORModel } from "../lib/openrouter";
 import { detectLanguage } from "../i18n/detect";
 import { loadJSON, saveJSON } from "../lib/storage";
+import { hasDots } from "../lib/arabic";
 
 describe("detectLanguage", () => {
   it("returns 'ar' for Arabic locales", () => {
@@ -53,5 +54,19 @@ describe("filterModels", () => {
   it("caps results", () => {
     const many = Array.from({ length: 100 }, (_, i) => ({ id: `m/${i}`, name: `M${i}` }));
     expect(filterModels(many, "m").length).toBeLessThanOrEqual(50);
+  });
+});
+
+describe("hasDots", () => {
+  it("detects dotted text", () => {
+    expect(hasDots("كتب الطالب الدرس")).toBe(true);
+  });
+  it("returns false for dotless rasm", () => {
+    // the same phrase after remove_dots
+    expect(hasDots("كٮٮ الطالٮ الدرس")).toBe(false);
+  });
+  it("returns false for empty / non-Arabic", () => {
+    expect(hasDots("")).toBe(false);
+    expect(hasDots("hello")).toBe(false);
   });
 });

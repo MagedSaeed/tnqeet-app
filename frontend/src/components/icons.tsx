@@ -19,6 +19,50 @@ export function Spinner({ className = "h-3.5 w-3.5" }: { className?: string }) {
   );
 }
 
+// Two overlapping sheets — the icon for the copy action.
+export function CopyIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden="true">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+      <path
+        d="M10.5 2.5H3.5A1.5 1.5 0 0 0 2 4v7"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+// Checkmark — shown briefly after a successful copy.
+export function CheckIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden="true">
+      <path
+        d="M3 8.5l3 3 7-7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// A simple ✕ — dismiss/close affordance.
+export function CloseIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className={className} fill="none" aria-hidden="true">
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 // Dots with a slash — the icon for removing dots (back to the rasm).
 export function RemoveDotsIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
   return (

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useI18n } from "../i18n";
 import { EXAMPLES } from "../data/examples";
+import { Collapse } from "./Collapse";
 
 export function Examples({ onPick }: { onPick: (text: string) => void }) {
   const { t } = useI18n();
@@ -34,7 +35,7 @@ export function Examples({ onPick }: { onPick: (text: string) => void }) {
           >
             <span className="font-mono">{showMore ? "–" : "+"}</span> {t.moreExamples}
           </button>
-          {showMore && (
+          <Collapse open={showMore}>
             <div className="mt-2 flex flex-col gap-1.5">
               {long.map((e) => (
                 <button
@@ -48,7 +49,7 @@ export function Examples({ onPick }: { onPick: (text: string) => void }) {
                 </button>
               ))}
             </div>
-          )}
+          </Collapse>
         </>
       )}
     </section>

@@ -3,7 +3,7 @@ import { useI18n } from "../i18n";
 import type { MethodInfo } from "../lib/api";
 import { restoreDots } from "../lib/api";
 import { DiffText } from "./DiffText";
-import { btnPrimary } from "../lib/ui";
+import { Collapse } from "./Collapse";
 import { Spinner } from "./icons";
 
 interface Props {
@@ -57,19 +57,23 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setOpen((o) => !o)}
-          className="text-sm font-medium text-ink transition hover:text-accent"
+          className="text-[0.9rem] font-semibold text-muted transition hover:text-accent"
           aria-expanded={open}
         >
-          <span className="font-mono text-muted">{open ? "–" : "+"}</span> {t.compareAll}
+          <span className="font-mono">{open ? "–" : "+"}</span> {t.compareAll}
         </button>
         {open && (
-          <button onClick={runAll} disabled={running || !text.trim()} className={btnPrimary}>
+          <button
+            onClick={runAll}
+            disabled={running || !text.trim()}
+            className="inline-flex items-center gap-1.5 text-[0.9rem] font-semibold text-accent underline-offset-4 transition hover:underline disabled:cursor-not-allowed disabled:text-muted/50 disabled:no-underline"
+          >
             {running && <Spinner />}
             {t.runAll}
           </button>
         )}
       </div>
-      {open && (
+      <Collapse open={open}>
         <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {methods.map((m) => {
             const cell = results[m.id];
@@ -95,7 +99,7 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
             );
           })}
         </div>
-      )}
+      </Collapse>
     </section>
   );
 }
