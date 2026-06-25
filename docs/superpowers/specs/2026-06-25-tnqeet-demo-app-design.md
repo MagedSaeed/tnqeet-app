@@ -74,7 +74,7 @@ and a **React frontend** that is clean, intuitive, and nice to look at.
 - **Dev:** Vite dev server serves the frontend and proxies `/api` to FastAPI.
 - **Prod:** the frontend is built to static assets and **served by FastAPI**, so the whole
   app runs as one process / one container.
-- **Python env:** managed with **uv**.
+- **Python env:** managed with **uv**, pinned to **Python 3.10** (matches the tnqeet runtime).
 
 ### Backend module layout (proposed)
 ```
@@ -133,7 +133,12 @@ frontend/
 
 ## 6. API Surface
 
-All endpoints are under `/api`, JSON in/out.
+All endpoints are under `/api`, JSON in/out. Both `remove-dots` and `restore-dots` enforce a
+**max input length** (configurable, default 5000 characters) and return `400` if exceeded, to
+bound request cost.
+
+### `GET /api/health`
+Lightweight liveness probe for Railway/containers: `{ "status": "ok" }` (no model loading).
 
 ### `GET /api/methods`
 Returns the method catalog for the UI to render tabs.
@@ -251,6 +256,21 @@ the textbox on click.
 ### Railway
 - Deploy the baked image directly — **no volume needed**. Cold starts do no network I/O for
   weights; the filesystem being ephemeral is irrelevant because weights live in the image.
+- Use `GET /api/health` as the Railway healthcheck path.
+
+### Operational notes (consequence of baking the largest variants)
+- **Image size:** baking LSTM 6L + Transformer 12L + CANINE c + n-gram order 8 produces a
+  **large image** (potentially multiple GB — the high-order n-gram binary and 12L transformer
+  are the heaviest). Builds are slower and the registry/Railway image is big. Accepted
+  trade-off for quality; switch the `BAKED_MODELS` build arg to lighter variants if it becomes
+  a problem.
+- **Memory:** lazy loading means a method stays resident after first use. **"Compare all"**
+  can therefore hold *several* large models in RAM at once. To bound this, compare-all runs
+  methods **sequentially**, and the dotter cache supports an optional **max-resident limit**
+  (LRU eviction) so a small Railway instance doesn't OOM. Pick a Railway plan with enough RAM
+  for the largest single model at minimum; more if you want the neural models to stay warm.
+- These are deployment-tuning knobs, not blockers — defaults favor correctness, and the build
+  arg + cache limit let you trade quality vs. footprint without code changes.
 
 ## 10. Testing
 
