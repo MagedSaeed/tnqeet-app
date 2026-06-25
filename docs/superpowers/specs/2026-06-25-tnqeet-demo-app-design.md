@@ -112,13 +112,17 @@ frontend/
 ## 5. Methods & Model Management
 
 - **All five methods** are wired up (option C): n-gram, LSTM, Transformer, CANINE, LLM.
-- **One model baked per method** — the tnqeet default (LSTM `4L`, Transformer `6L`,
-  CANINE `s`, n-gram order `6`) plus the tokenizer (`MagedSaeed/tnqeet-tokenizer`).
-  The baked set is a **Docker build arg** so it can be expanded or swapped (e.g. to the
-  largest/most-accurate variants) without code changes.
-- Because only one size ships per method, the **UI has no size selector**. Instead it shows
-  a short note: *"This demo uses the recommended model for each method. tnqeet supports
-  additional sizes/variants — omitted here for performance and convenience."*
+- **One model baked per method — the largest / most-accurate variant**: LSTM `6L`,
+  Transformer `12L`, CANINE `c`, n-gram order `8`, plus the tokenizer
+  (`MagedSaeed/tnqeet-tokenizer`). This favors output quality over image size (an accepted
+  trade-off). The baked set is a **Docker build arg** so it can be swapped (e.g. to lighter
+  variants) without code changes.
+  *(Note: CANINE's `c`/`s` are model variants, not a size ordering; `c` is the default pick.)*
+- Because only one model ships per method, the **UI has no size selector**. Instead it shows
+  a short note (with "package" linked to the PyPI page,
+  `https://pypi.org/project/tnqeet/`): *"This demo uses the recommended model for each
+  method. tnqeet supports additional sizes/variants — they're omitted here for performance
+  and convenience. See the [package] to use them."*
 - **Lazy loading + caching:** each dotter is constructed on first request for that method and
   kept in memory for subsequent requests. Because weights are baked, the first request does
   **not** download anything in production.
@@ -247,6 +251,5 @@ i18n via a small custom `en`/`ar` dictionary + context (no heavy library).
 
 ## 11. Open Questions / Future
 
-- Confirm "best per method" = tnqeet defaults (assumed) vs. largest/most-accurate variants.
 - Confirm the seed example sentences (or supply preferred ones).
 - Future: optional caching of OpenRouter model list; rate limiting; an OpenAPI-driven client.
