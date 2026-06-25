@@ -2,12 +2,9 @@ import { useCallback, useRef, useState } from "react";
 
 const EXIT = "height 0.28s ease, opacity 0.28s ease, margin 0.28s ease, padding 0.28s ease";
 
-// Smoothly collapses an element before the parent unmounts it: fades it out
-// while shrinking its height/margins to zero, so content below slides up
-// instead of snapping. Attach `ref` and `onTransitionEnd` to the element, use
-// `className` for the entrance, and call `dismiss` from the close button.
-//
-// Honors prefers-reduced-motion by closing immediately.
+// Collapses height/opacity to zero before unmount, so content below slides up
+// instead of snapping. Attach `ref`/`onTransitionEnd`, call `dismiss` to close.
+// Honors prefers-reduced-motion.
 export function useDismiss(onClose: () => void) {
   const ref = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
@@ -21,8 +18,7 @@ export function useDismiss(onClose: () => void) {
       onClose();
       return;
     }
-    // Pin the current height, then collapse to zero on the next frame so the
-    // browser has a concrete start value to transition from.
+    // Pin height, reflow, then collapse so the transition has a start value.
     el.style.height = `${el.scrollHeight}px`;
     el.style.overflow = "hidden";
     void el.offsetHeight; // force reflow

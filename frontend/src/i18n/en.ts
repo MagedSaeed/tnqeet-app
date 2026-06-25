@@ -32,6 +32,12 @@ export interface Dict {
   close: string;
   dotsWarning: string;
   toggleHighlight: string;
+  lengthMismatchNote: string;
+  legendDots: string;
+  legendOther: string;
+  charsInput: string;
+  charsOutput: string;
+  charsUnit: string;
 }
 
 export const en: Dict = {
@@ -69,6 +75,12 @@ export const en: Dict = {
   errorDetails: "Error details",
   close: "Close",
   toggleHighlight: "Show/hide dots color highlighting",
+  lengthMismatchNote: "The output length differs from the input — the model altered the original text.",
+  legendDots: "restored dots",
+  legendOther: "other changes",
+  charsInput: "input",
+  charsOutput: "output",
+  charsUnit: "chars",
   dotsWarning:
     "Your text still has dots. Restoration is meant for dotless rasm — use “Remove dots” first to see the effect. (The server removes them anyway before restoring.)",
 };

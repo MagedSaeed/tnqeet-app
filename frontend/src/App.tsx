@@ -24,7 +24,9 @@ function Inner() {
   const [methods, setMethods] = useState<MethodInfo[]>([]);
   const [active, setActive] = useState("transformer");
   const [text, setText] = useState(EXAMPLES[0].text);
-  const [result, setResult] = useState<{ input: string; text: string; label: string } | null>(null);
+  const [result, setResult] = useState<{ rasm: string; text: string; label: string } | null>(
+    null
+  );
   const [busy, setBusy] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [error, setError] = useState<{ message: string; detail?: string } | null>(null);
@@ -74,9 +76,15 @@ function Inner() {
 
   const onRestore = async () => {
     setError(null);
-    // Restoration expects dotless rasm; warn if the user skipped removal. The
-    // server undots anyway, so we still proceed.
-    setShowDotsWarning(hasDots(text));
+    if (hasDots(text)) {
+      // First click on dotted input: warn and stop. Second click proceeds.
+      if (!showDotsWarning) {
+        setShowDotsWarning(true);
+        return;
+      }
+    } else {
+      setShowDotsWarning(false);
+    }
     setBusy(true);
     setRestoring(true);
     const sent = text;
@@ -87,7 +95,7 @@ function Inner() {
         model: active === "llm" ? model : undefined,
         apiKey: active === "llm" ? apiKey : undefined,
       });
-      setResult({ input: sent, text: r.text, label: activeMethod?.label ?? active });
+      setResult({ rasm: r.rasm, text: r.text, label: activeMethod?.label ?? active });
     } catch (e) {
       setError(toError(e));
     } finally {
@@ -152,7 +160,7 @@ function Inner() {
         )}
         {result && (
           <ResultPanel
-            input={result.input}
+            rasm={result.rasm}
             text={result.text}
             methodLabel={result.label}
             onClose={() => setResult(null)}

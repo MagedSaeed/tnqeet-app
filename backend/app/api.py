@@ -18,12 +18,7 @@ router = APIRouter(prefix="/api")
 
 
 def _error_detail(exc: Exception) -> str:
-    """A concise, UI-safe description of an upstream failure.
-
-    dspy wraps the real cause after an 'Original error:' marker; keep only that
-    tail. Provider error pages can be huge HTML — replace those with a short
-    note, and cap everything else so the client never receives a wall of text.
-    """
+    """Concise, UI-safe description of an upstream failure."""
     msg = str(exc).strip()
     marker = "Original error:"
     if marker in msg:
@@ -95,4 +90,5 @@ def restore_dots(req: RestoreDotsRequest):
                 "detail": _error_detail(exc),
             },
         )
-    return {"text": text, "method": req.method}
+    # rasm is the undotted input the model saw; the client diffs against it.
+    return {"text": text, "method": req.method, "rasm": dotters.remove_dots(req.text)}

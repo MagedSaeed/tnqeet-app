@@ -41,7 +41,10 @@ export function Examples({ onPick }: { onPick: (text: string) => void }) {
                 <button
                   key={e.text}
                   dir="rtl"
-                  onClick={() => onPick(e.text)}
+                  onClick={() => {
+                    onPick(e.text);
+                    setShowMore(false);
+                  }}
                   title={e.text}
                   className="truncate rounded-xl border border-line bg-surface px-4 py-2.5 text-right font-arabic text-sm text-muted transition hover:border-accent/40 hover:text-ink"
                 >

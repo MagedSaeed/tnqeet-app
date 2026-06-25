@@ -1,24 +1,35 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useI18n } from "../i18n";
 import { useDismiss } from "../hooks/useDismiss";
+import { classifyOutput } from "../lib/diff";
 import { DiffText } from "./DiffText";
 import { CopyIcon, CheckIcon, CloseIcon, DotsIcon } from "./icons";
 
 interface Props {
-  input: string;
+  rasm: string;
   text: string;
   methodLabel: string;
   onClose: () => void;
 }
 
-export function ResultPanel({ input, text, methodLabel, onClose }: Props) {
+export function ResultPanel({ rasm, text, methodLabel, onClose }: Props) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const [highlight, setHighlight] = useState(true);
   const { ref, dismiss, onTransitionEnd, className } = useDismiss(onClose);
 
+  // Ignore leading/trailing whitespace the model may add; internal differences
+  // are kept and shown.
+  const base = rasm.trim();
+  const out = text.trim();
+  const segments = useMemo(() => classifyOutput(base, out), [base, out]);
+  const inLen = [...base].length;
+  const outLen = [...out].length;
+  const lengthMismatch = inLen !== outLen;
+  const hasOther = !!segments?.some((s) => s.kind === "other");
+
   const copy = async () => {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(out);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
   };
@@ -66,11 +77,36 @@ export function ResultPanel({ input, text, methodLabel, onClose }: Props) {
         </div>
       </div>
       <DiffText
-        input={input}
-        output={text}
+        output={out}
+        segments={segments}
         highlight={highlight}
         className="p-5 font-arabic text-[1.05rem] leading-[1.8] text-ink"
       />
+      {highlight && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-line bg-paper/50 px-5 py-2.5 text-xs text-muted">
+          <span>
+            {t.charsInput}: {inLen} {t.charsUnit} · {t.charsOutput}: {outLen} {t.charsUnit}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+            {t.legendDots}
+          </span>
+          {hasOther && (
+            <span className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 rounded-full bg-sky-600 dark:bg-sky-400"
+                aria-hidden="true"
+              />
+              {t.legendOther}
+            </span>
+          )}
+          {lengthMismatch && (
+            <span className="leading-relaxed">
+              <span aria-hidden="true">ℹ</span> {t.lengthMismatchNote}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

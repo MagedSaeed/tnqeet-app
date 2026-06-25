@@ -22,6 +22,7 @@ class RestoreDotsRequest(BaseModel):
 class RestoreResponse(BaseModel):
     text: str
     method: str
+    rasm: str  # the undotted input the model operated on (diff baseline)
 
 
 class MethodInfo(BaseModel):

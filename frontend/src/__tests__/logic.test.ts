@@ -3,6 +3,7 @@ import { filterModels, type ORModel } from "../lib/openrouter";
 import { detectLanguage } from "../i18n/detect";
 import { loadJSON, saveJSON } from "../lib/storage";
 import { hasDots } from "../lib/arabic";
+import { classifyOutput } from "../lib/diff";
 
 describe("detectLanguage", () => {
   it("returns 'ar' for Arabic locales", () => {
@@ -68,5 +69,26 @@ describe("hasDots", () => {
   it("returns false for empty / non-Arabic", () => {
     expect(hasDots("")).toBe(false);
     expect(hasDots("hello")).toBe(false);
+  });
+});
+
+describe("classifyOutput", () => {
+  const kinds = (input: string, output: string) =>
+    classifyOutput(input, output)!.map((s) => s.kind);
+
+  it("marks restored dots vs unchanged letters", () => {
+    // rasm "كٮٮ" -> "كتب": ك unchanged, ت/ب are restored dots
+    expect(kinds("كٮٮ", "كتب")).toEqual(["same", "dot", "dot"]);
+  });
+  it("marks non-dot insertions as other", () => {
+    // trailing period not present in the input
+    expect(kinds("كٮٮ", "كتب.")).toEqual(["same", "dot", "dot", "other"]);
+  });
+  it("treats madda/hamza restoration (ا -> آ) as a dot, not other", () => {
+    expect(kinds("ا", "آ")).toEqual(["dot"]);
+  });
+  it("blues an inserted tashkeel and its base letter", () => {
+    // دورا -> دوراً : the fathatan and the alef it sits on both become 'other'
+    expect(kinds("دورا", "دوراً")).toEqual(["same", "same", "same", "other", "other"]);
   });
 });

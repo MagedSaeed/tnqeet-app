@@ -88,14 +88,8 @@ def _get_or_load(method_id: str):
 
 
 def _openrouter_model(model: str) -> str:
-    """Ensure `model` is routed through OpenRouter by litellm.
-
-    litellm picks the provider from the leading path segment, so an OpenRouter
-    model id like 'anthropic/claude-sonnet-4.5' is otherwise sent to the *native*
-    Anthropic provider — which, against the OpenRouter api_base, hits a bad path
-    and returns an HTML 404 (litellm.NotFoundError) that surfaced as a 502.
-    Prefixing 'openrouter/' makes litellm use its OpenRouter handler.
-    """
+    """Prefix 'openrouter/' so litellm routes via OpenRouter, not the native
+    provider (which would 404 against the OpenRouter api_base)."""
     return model if model.startswith("openrouter/") else f"openrouter/{model}"
 
 
@@ -124,21 +118,21 @@ def restore(method_id: str, text: str, model: str | None = None,
 
 
 def ensure_weights() -> None:
-    """Pre-download weight files for available methods into the HF cache.
+    """Warm the HF cache for available methods by loading each once at startup.
 
-    Runs at startup. hf_hub_download shows a tqdm progress bar for files it
-    actually downloads; already-cached files are a no-op.
+    Loading (not just resolve_weight) is required: the neural models also pull a
+    tokenizer — and CANINE a transformer backbone — from the Hub at load time, so
+    fetching only the checkpoint would leave those to download on first click.
+    The instance is discarded; this just populates the cache.
     """
-    from tnqeet.weights import resolve_weight  # type: ignore
-
     for method in ("ngram", "lstm", "transformer", "canine"):
         if not is_available(method):
             print(f"[weights] {method}: skipped (dependency unavailable)", flush=True)
             continue
         size = config.BAKED_MODELS[method]
         try:
-            print(f"[weights] {method} ({size}): checking…", flush=True)
-            resolve_weight(method, size=int(size) if method == "ngram" else size)
+            print(f"[weights] {method} ({size}): loading…", flush=True)
+            _load(method)
             print(f"[weights] {method} ({size}): ready", flush=True)
         except Exception as exc:  # noqa: BLE001
             print(f"[weights] {method} ({size}): failed — {exc}", flush=True)

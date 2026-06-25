@@ -44,7 +44,8 @@ def test_restore_dispatches(monkeypatch):
     monkeypatch.setattr(dotters, "restore", lambda method, text, **kw: text + "+" + method)
     r = client.post("/api/restore-dots", json={"text": "rasm", "method": "lstm"})
     assert r.status_code == 200
-    assert r.json() == {"text": "rasm+lstm", "method": "lstm"}
+    # rasm is remove_dots(input); ASCII input is unchanged.
+    assert r.json() == {"text": "rasm+lstm", "method": "lstm", "rasm": "rasm"}
 
 
 def test_restore_llm_without_key_is_400(monkeypatch):

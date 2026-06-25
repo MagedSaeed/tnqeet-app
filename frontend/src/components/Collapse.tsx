@@ -2,9 +2,8 @@ import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 const DURATION = "height 0.3s ease";
 
-// Animates its content's height between 0 and auto as `open` toggles, so
-// disclosures expand/collapse smoothly instead of snapping. Stays mounted;
-// just clipped to zero height when closed. Honors prefers-reduced-motion.
+// Smoothly animates height between 0 and auto as `open` toggles.
+// Stays mounted; honors prefers-reduced-motion.
 export function Collapse({
   open,
   children,

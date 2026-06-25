@@ -60,6 +60,8 @@ export interface RestoreArgs {
   apiKey?: string;
 }
 
-export function restoreDots(args: RestoreArgs): Promise<{ text: string; method: string }> {
+export function restoreDots(
+  args: RestoreArgs
+): Promise<{ text: string; method: string; rasm: string }> {
   return postJSON("/api/restore-dots", args);
 }

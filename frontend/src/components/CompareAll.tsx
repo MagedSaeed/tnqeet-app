@@ -19,12 +19,10 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<Record<string, Cell>>({});
-  const [comparedInput, setComparedInput] = useState("");
   const [running, setRunning] = useState(false);
 
   const runAll = async () => {
     setRunning(true);
-    setComparedInput(text);
     const out: Record<string, Cell> = {};
     // Sequential: bounds memory (matches the backend's resident-model cache).
     for (const m of methods) {
@@ -88,7 +86,6 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
                   </div>
                 ) : cell.kind === "ok" ? (
                   <DiffText
-                    input={comparedInput}
                     output={cell.value}
                     className="font-arabic text-[0.95rem] leading-[1.9] text-ink"
                   />
