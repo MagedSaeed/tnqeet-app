@@ -1,5 +1,6 @@
 import { useI18n } from "../i18n";
-import { btnGhost } from "../lib/ui";
+import { btnSecondary } from "../lib/ui";
+import { RemoveDotsIcon } from "./icons";
 
 interface Props {
   value: string;
@@ -16,7 +17,8 @@ export function TextBox({ value, onChange, onRemoveDots, busy }: Props) {
         <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted">
           {t.yourText}
         </span>
-        <button onClick={onRemoveDots} disabled={busy || !value.trim()} className={btnGhost}>
+        <button onClick={onRemoveDots} disabled={busy || !value.trim()} className={btnSecondary}>
+          <RemoveDotsIcon />
           {t.removeDots}
         </button>
       </div>

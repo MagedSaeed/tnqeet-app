@@ -99,10 +99,10 @@ function Inner() {
               <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
             </div>
           ) : (
-            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-muted">
+            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-muted/80">
               {t.modelNote}{" "}
               <a
-                className="text-muted underline underline-offset-2 hover:text-ink"
+                className="text-muted/80 underline underline-offset-2 hover:text-ink"
                 href="https://pypi.org/project/tnqeet/"
                 target="_blank"
                 rel="noreferrer"

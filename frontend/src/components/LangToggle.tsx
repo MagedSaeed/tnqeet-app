@@ -1,10 +1,11 @@
+import type { ReactNode } from "react";
 import { useI18n } from "../i18n";
 import type { Lang } from "../i18n/detect";
 
 export function LangToggle() {
   const { lang, setLang } = useI18n();
 
-  const option = (code: Lang, text: string) => (
+  const option = (code: Lang, content: ReactNode) => (
     <button
       aria-pressed={lang === code}
       onClick={() => setLang(code)}
@@ -12,7 +13,7 @@ export function LangToggle() {
         lang === code ? "text-accent-contrast" : "text-muted hover:text-ink"
       }`}
     >
-      {text}
+      {content}
     </button>
   );
 
@@ -31,7 +32,8 @@ export function LangToggle() {
         style={{ transform: lang === "ar" ? "translateX(100%)" : "translateX(0)" }}
       />
       {option("en", "EN")}
-      {option("ar", "ع")}
+      {/* nudge the Arabic glyph up to sit on the same optical line as EN */}
+      {option("ar", <span className="relative -top-0.5">ع</span>)}
     </div>
   );
 }

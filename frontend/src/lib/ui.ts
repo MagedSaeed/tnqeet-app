@@ -17,7 +17,15 @@ export const btnPrimary = `${primaryBase} px-5 py-2.5 text-sm`;
 // Hero primary (the main Restore action) — a touch larger.
 export const btnPrimaryHero = `${primaryBase} px-6 py-3 text-base`;
 
-// Quiet bordered action (Remove dots, Show, Edit). Clear accent-tinted hover.
+// Solid neutral action (Remove dots) — clearly a button (ink text, surface fill,
+// shadow), but neutral so it doesn't compete with the accent primary.
+export const btnSecondary =
+  "inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-1.5 " +
+  "text-xs font-semibold text-ink shadow-sm transition " +
+  "hover:border-accent/60 hover:bg-accent/10 hover:text-accent active:translate-y-px " +
+  "disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:hover:border-line disabled:hover:bg-surface disabled:hover:text-ink";
+
+// Quiet bordered action (Show, Edit). Clear accent-tinted hover.
 export const btnGhost =
   "inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 " +
   "text-xs font-medium text-muted transition " +
