@@ -832,18 +832,19 @@ git commit -m "test(backend): API endpoint tests with stubbed models"
 
 ---
 
-### Task 10: Weight-baking script
+### Task 10: Weight-download script
 
 **Files:**
-- Create: `backend/scripts/bake_weights.py`
+- Create: `backend/scripts/download_weights.py`
 
-- [ ] **Step 1: Write `backend/scripts/bake_weights.py`**
+- [ ] **Step 1: Write `backend/scripts/download_weights.py`**
 
 ```python
-"""Warm the Hugging Face cache with the baked models so the runtime image needs
-no network. Run at Docker build time with HF_HOME pointed at the image cache dir.
+"""Download the selected model weights into the Hugging Face cache so the runtime
+image needs no network. Run at Docker build time with HF_HOME pointed at the
+image cache dir; the downloaded weights then live in that cached image layer.
 
-Usage (from backend/): python scripts/bake_weights.py
+Usage (from backend/): python scripts/download_weights.py
 """
 import sys
 
@@ -853,14 +854,14 @@ from app import config, dotters
 def main() -> int:
     for method in ("lstm", "transformer", "canine", "ngram"):
         size = config.BAKED_MODELS[method]
-        print(f"[bake] loading {method} ({size}) ...", flush=True)
+        print(f"[download] fetching {method} ({size}) ...", flush=True)
         try:
             dotters._load(method)
-            print(f"[bake] {method} OK", flush=True)
+            print(f"[download] {method} OK", flush=True)
         except Exception as exc:  # noqa: BLE001
-            print(f"[bake] {method} FAILED: {exc}", file=sys.stderr, flush=True)
+            print(f"[download] {method} FAILED: {exc}", file=sys.stderr, flush=True)
             return 1
-    print("[bake] all models cached", flush=True)
+    print("[download] all models cached", flush=True)
     return 0
 
 
@@ -872,15 +873,15 @@ if __name__ == "__main__":
 
 Run (from `backend/`):
 ```bash
-uv run python -c "import ast; ast.parse(open('scripts/bake_weights.py').read()); print('ok')"
+uv run python -c "import ast; ast.parse(open('scripts/download_weights.py').read()); print('ok')"
 ```
-Expected: prints `ok`. (Do not run the full bake locally — it downloads large weights and needs KenLM; the Docker build runs it.)
+Expected: prints `ok`. (Do not run the full download locally — it fetches large weights and needs KenLM; the Docker build runs it.)
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add backend/scripts/bake_weights.py
-git commit -m "feat(backend): weight-baking script for Docker build"
+git add backend/scripts/download_weights.py
+git commit -m "feat(backend): weight-download script for Docker build"
 ```
 
 ---
@@ -2276,11 +2277,11 @@ RUN MAX_ORDER=8 uv pip install "git+https://github.com/kpu/kenlm.git"
 # App source.
 COPY backend/ ./
 
-# Bake the largest model variants into the image's HF cache (no runtime download).
-# Override BAKED_MODELS via env build args if desired (see app/config.py).
+# Download the largest model variants into the image's HF cache (no runtime
+# download). Override the variants via env build args if desired (see app/config.py).
 ENV HF_HOME=/app/models
-ARG BAKE_WEIGHTS=true
-RUN if [ "$BAKE_WEIGHTS" = "true" ]; then uv run python scripts/bake_weights.py; fi
+ARG DOWNLOAD_WEIGHTS=true
+RUN if [ "$DOWNLOAD_WEIGHTS" = "true" ]; then uv run python scripts/download_weights.py; fi
 
 # Bring in the built frontend and point the app at it.
 COPY --from=frontend /fe/dist /app/frontend_dist
@@ -2297,7 +2298,7 @@ Run (from repo root):
 ```bash
 docker build -t tnqeet-app .
 ```
-Expected: build succeeds. The `[bake]` lines print each model caching successfully.
+Expected: build succeeds. The `[download]` lines print each model caching successfully.
 
 - [ ] **Step 4: Run and smoke-test**
 
@@ -2328,14 +2329,15 @@ git commit -m "build: multi-stage Dockerfile (CPU torch, KenLM, baked weights)"
 - [ ] **Step 1: Write `docker-compose.yml`**
 
 ```yaml
-# Local dev: build WITHOUT baking weights, and bind-mount ./models so weights
-# download once to a visible host folder (persists across restarts; no rebuild).
+# Local dev: build WITHOUT downloading weights into the image, and bind-mount
+# ./models so weights download once to a visible host folder (persists across
+# restarts; no rebuild).
 services:
   app:
     build:
       context: .
       args:
-        BAKE_WEIGHTS: "false"
+        DOWNLOAD_WEIGHTS: "false"
     ports:
       - "8000:8000"
     environment:
