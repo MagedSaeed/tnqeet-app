@@ -1,13 +1,10 @@
-# Railway config. Weights are downloaded at runtime into HF_HOME=/app/models,
-# so attach a Railway VOLUME mounted at /app/models (Dashboard → service →
-# Volumes, or `railway volume add --mount-path /app/models`). The image stays
-# small; models download once to the volume and persist across deploys.
+# Railway config. Weights download at runtime into HF_HOME=/home/user/.cache/huggingface,
+# so attach a Railway VOLUME mounted at that path (`railway volume add
+# --mount-path /home/user/.cache/huggingface`). The image stays small; models
+# download once to the volume and persist across deploys.
 #
-# Recommended service variables:
-#   HF_HOME=/app/models                 (already set in the image, override if needed)
-#   TNQEET_MAX_RESIDENT_MODELS=1        (lower peak RAM on small plans)
-#
-# First request per method downloads its weight to the volume (slow once, fast after).
+# Recommended service variable on small plans:
+#   TNQEET_MAX_RESIDENT_MODELS=1   (lower peak RAM)
 
 [build]
 builder = "dockerfile"

@@ -1,3 +1,13 @@
+---
+title: tnqeet
+emoji: ✒️
+colorFrom: red
+colorTo: gray
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # tnqeet demo app
 
 A small web app demonstrating the [`tnqeet`](https://pypi.org/project/tnqeet/) library:
@@ -35,13 +45,15 @@ cd frontend && npm test
 ## Docker
 
 The image does **not** bundle the model weights — they download at runtime into
-`HF_HOME=/app/models`, which you mount as a volume so the image stays small and the
-weights persist (downloaded once, on first use, per method).
+`HF_HOME=/home/user/.cache/huggingface`. Mount a volume there so the image stays
+small and weights persist (downloaded once, on first use, per method). The image
+runs as a non-root user (uid 1000), so it works on Railway, Hugging Face Spaces,
+and plain Docker.
 
 ```bash
 docker build -t tnqeet-app .
 # mount a host folder for the weights so they're not re-downloaded each run:
-docker run --rm -p 8000:8000 -v "$(pwd)/docker_volume/models:/app/models" tnqeet-app
+docker run --rm -p 8000:8000 -v "$(pwd)/docker_volume/models:/home/user/.cache/huggingface" tnqeet-app
 # open http://localhost:8000
 ```
 
@@ -52,12 +64,28 @@ docker compose up --build
 
 > First request per method downloads its weight to the volume (slow once, fast after).
 
+## Deploy to Hugging Face Spaces
+
+Create a **Docker** Space and push this repo (the README header above is the Space
+config; it serves on `app_port: 8000`). The free **CPU Basic** tier (16 GB RAM)
+runs all methods comfortably.
+
+- Weights download to `HF_HOME` on first use. Space storage is **ephemeral**, so
+  they re-download after a rebuild/restart (fast — same network as the Hub).
+- For persistence, add Spaces **persistent storage** and set `HF_HOME=/data`.
+
+```bash
+# one-time: add the Space as a remote and push
+git remote add space https://huggingface.co/spaces/<user>/<space>
+git push space master:main
+```
+
 ## Deploy to Railway
 
 Railway builds the `Dockerfile` directly (see `railway.toml`). Attach a **volume
-mounted at `/app/models`** (Dashboard → service → Volumes, or
-`railway volume add --mount-path /app/models`); weights download once to the volume
-and persist across deploys, keeping the image small. Healthcheck path: `/api/health`.
+mounted at `/home/user/.cache/huggingface`** (Dashboard → service → Volumes, or
+`railway volume add --mount-path /home/user/.cache/huggingface`); weights download
+once to the volume and persist across deploys. Healthcheck path: `/api/health`.
 On a small plan, set `TNQEET_MAX_RESIDENT_MODELS=1` to lower peak RAM.
 
 ## Configuration (env vars)

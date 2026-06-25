@@ -5,8 +5,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      HF_HOME: /app/models
+      HF_HOME: /home/user/.cache/huggingface
       FRONTEND_DIST: /app/frontend_dist
       TNQEET_MAX_RESIDENT_MODELS: "2" # set 1 for low RAM
     volumes:
-      - ./docker_volume/models:/app/models
+      - ./docker_volume/models:/home/user/.cache/huggingface
