@@ -2,9 +2,9 @@ import { useI18n } from "../i18n";
 
 export function LangToggle() {
   const { lang, setLang } = useI18n();
-  const cell = "rounded-full px-3 py-1 text-xs font-semibold transition";
-  const on = "bg-accent text-accent-contrast shadow-sm";
-  const off = "text-muted hover:text-ink";
+  const cell = "rounded-full px-3.5 py-1 text-sm font-bold leading-none transition";
+  const on = "bg-accent text-accent-contrast shadow";
+  const off = "text-muted/50 hover:text-ink";
   return (
     <div className="inline-flex items-center gap-0.5 rounded-full border border-line bg-surface p-0.5">
       <button
