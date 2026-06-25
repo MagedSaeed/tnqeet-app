@@ -10,7 +10,6 @@ export const ar: Dict = {
   ruleBased: "قائم على قواعد",
   restore: "استعادة",
   examples: "أمثلة",
-  result: "النتيجة",
   copy: "نسخ",
   copied: "تم النسخ",
   compareAll: "مقارنة كل الطرق",

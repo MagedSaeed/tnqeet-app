@@ -10,11 +10,13 @@ Backend (Python 3.10, uv):
 ```bash
 cd backend
 uv venv --python 3.10
-uv pip install -e ".[dev]"   # CPU torch via tnqeet[cpu] + pyproject [tool.uv] index config
+uv pip install -e ".[dev]"   # CPU torch via the PyTorch CPU index in pyproject [tool.uv]
 uv run uvicorn app.main:app --port 8000
 ```
-> Follows tnqeet's official CPU install (the `[cpu]` extra + PyTorch CPU index).
-> KenLM is not installed locally, so the n-gram method reports unavailable until you
+> CPU-only torch is delivered by the PyTorch CPU index + `index-strategy =
+> "unsafe-best-match"` configured in `backend/pyproject.toml` (tnqeet 0.1.2 has no
+> `[cpu]` extra). KenLM is not installed locally, so the n-gram method reports
+> unavailable until you
 > run inside Docker (or `MAX_ORDER=8 uv pip install "git+https://github.com/kpu/kenlm.git"`).
 
 Frontend:

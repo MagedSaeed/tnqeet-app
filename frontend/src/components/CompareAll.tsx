@@ -22,7 +22,7 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
     // Sequential: bounds memory (matches backend cache limit).
     for (const m of methods) {
       if (!m.available) { out[m.id] = `— ${t.unavailable} —`; continue; }
-      if (m.requiresKey && !apiKey) { out[m.id] = `— ${t.unavailable} —`; continue; }
+      if (m.requiresKey && (!apiKey || !model)) { out[m.id] = `— ${t.enterKeyFirst} —`; continue; }
       try {
         const r = await restoreDots({ text, method: m.id, model, apiKey: m.requiresKey ? apiKey : undefined });
         out[m.id] = r.text;

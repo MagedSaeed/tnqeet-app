@@ -2486,3 +2486,17 @@ git commit -m "docs: project README (dev, Docker, Railway)"
 - Examples (prose/wikipedia/poetry) with package→PyPI link — Tasks 16, 21 ✓
 - Input cap, Python 3.10, CPU torch, KenLM build, weight bake, no-volume Railway — Tasks 1,2,9,10,22,23 ✓
 - Tests: backend pytest with stubs; frontend vitest for pure logic — Tasks 3,4,5,9,12,15 ✓
+
+---
+
+## Post-Review Refinements (applied during execution)
+
+Fixes from the final code review, applied to the code (and reflected above where inline):
+
+- **App.tsx** — method-catalog `useEffect` runs once on mount (removed `t.errorGeneric` dependency that caused a re-fetch on every language switch).
+- **LlmPanel.tsx** — OpenRouter model picker shows the human-readable `name` alongside the id, and **highlights the matched query substring** (spec §7) via a small `highlight()` helper.
+- **CompareAll.tsx** — the LLM method is gated on **both** key *and* model (`m.requiresKey && (!apiKey || !model)`); the skipped-cell message uses `t.enterKeyFirst`.
+- **i18n** — removed the unused `result` key from `Dict`/`en`/`ar` (dead code).
+- **README.md** — corrected the CPU-install note: tnqeet 0.1.2 has no `[cpu]` extra; CPU torch is delivered by the PyTorch CPU index + `index-strategy = "unsafe-best-match"` in `pyproject.toml`.
+
+Verified after refinements: backend `pytest` 13 passed; frontend `tsc --noEmit` clean, `vitest` 7 passed, `vite build` succeeds.

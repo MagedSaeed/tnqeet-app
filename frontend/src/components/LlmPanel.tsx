@@ -10,6 +10,21 @@ interface Props {
   onChangeModel: (m: string) => void;
 }
 
+// Highlight the matched portion of `text` for the given query.
+function highlight(text: string, query: string) {
+  const q = query.trim();
+  if (!q) return text;
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return text;
+  return (
+    <>
+      {text.slice(0, i)}
+      <mark className="rounded bg-indigo-400/40 text-inherit">{text.slice(i, i + q.length)}</mark>
+      {text.slice(i + q.length)}
+    </>
+  );
+}
+
 export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
   const { t } = useI18n();
   const [editingKey, setEditingKey] = useState(!apiKey);
@@ -93,8 +108,8 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
                 onClick={() => { saveJSON(KEYS.model, m.id); onChangeModel(m.id); setQuery(""); }}
                 className="flex cursor-pointer justify-between gap-3 px-3 py-2 text-sm hover:bg-indigo-500/10"
               >
-                <span className="font-mono opacity-85">{m.id}</span>
-                {m.name && m.name !== m.id && <span className="opacity-50">{m.name}</span>}
+                <span className="font-mono opacity-85">{highlight(m.id, query)}</span>
+                {m.name && m.name !== m.id && <span className="opacity-50">{highlight(m.name, query)}</span>}
               </div>
             ))}
           </div>

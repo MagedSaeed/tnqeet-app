@@ -7,7 +7,6 @@ export interface Dict {
   ruleBased: string;
   restore: string;
   examples: string;
-  result: string;
   copy: string;
   copied: string;
   compareAll: string;
@@ -42,7 +41,6 @@ export const en: Dict = {
   ruleBased: "rule-based",
   restore: "Restore",
   examples: "Examples",
-  result: "Result",
   copy: "Copy",
   copied: "Copied",
   compareAll: "Compare all methods",
