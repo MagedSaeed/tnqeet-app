@@ -1,0 +1,37 @@
+import type { Dict } from "./en";
+
+export const ar: Dict = {
+  title: "تَنقيط",
+  subtitle: "استعادة النقاط للرسم العربي",
+  description:
+    "الرسم العربي غير المنقوط ملتبس؛ إذ تشترك حروف كثيرة في الهيكل نفسه. يعيد tnqeet النقاط المحذوفة. اكتب نصك أو اختر مثالًا في الأسفل، ثم احذف نقاطه واستعدها بأي طريقة.",
+  yourText: "النص",
+  removeDots: "حذف النقاط",
+  ruleBased: "قائم على قواعد",
+  restore: "استعادة",
+  examples: "أمثلة",
+  result: "النتيجة",
+  copy: "نسخ",
+  copied: "تم النسخ",
+  compareAll: "مقارنة كل الطرق",
+  runAll: "تشغيل الكل",
+  unavailable: "غير متاح",
+  llmKeyLabel: "مفتاح OpenRouter",
+  llmKeyPlaceholder: "sk-or-v1-…",
+  llmKeyNote:
+    "يُحفظ في متصفحك فقط. ولا يُرسل إلى أي مكان آخر — يُرفق فقط بطلبك ليستدعي الخادمُ OpenRouter نيابةً عنك، ولا يُسجَّل أو يُخزَّن على الخادم.",
+  inBrowserOnly: "في المتصفح فقط",
+  save: "حفظ",
+  show: "إظهار",
+  hide: "إخفاء",
+  edit: "تعديل",
+  delete: "حذف",
+  getKey: "احصل على مفتاح",
+  modelLabel: "النموذج — ابحث في OpenRouter",
+  modelPlaceholder: "اكتب لتصفية النماذج…",
+  selected: "المُختار",
+  enterKeyFirst: "أدخل المفتاح أولًا",
+  modelNote: "يدعم tnqeet أحجامًا/أنواعًا إضافية، حُذفت هنا للأداء والتبسيط. انظر",
+  packageWord: "الحزمة",
+  errorGeneric: "حدث خطأ ما. حاول مرة أخرى.",
+};
