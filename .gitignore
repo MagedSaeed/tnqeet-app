@@ -1,0 +1,9 @@
+node_modules/
+dist/
+models/
+.venv/
+__pycache__/
+*.pyc
+.superpowers/
+.env
+.DS_Store
