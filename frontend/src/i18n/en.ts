@@ -8,7 +8,6 @@ export interface Dict {
   moreExamples: string;
   copy: string;
   copied: string;
-  restoredLegend: string;
   compareAll: string;
   runAll: string;
   unavailable: string;
@@ -37,12 +36,11 @@ export const en: Dict = {
     "Undotted Arabic script (Rasm) is ambiguous — many letters share the same skeleton. tnqeet restores the missing dots. Type your own text or pick an example below, remove its dots, then restore them with any method.",
   yourText: "Your text",
   removeDots: "Remove dots",
-  restore: "Restore",
+  restore: "Restore dots",
   examples: "Examples",
   moreExamples: "More examples",
   copy: "Copy",
   copied: "Copied",
-  restoredLegend: "restored letters",
   compareAll: "Compare all methods",
   runAll: "Run all",
   unavailable: "unavailable",

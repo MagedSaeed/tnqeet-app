@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useI18n } from "../i18n";
-import { DiffText, countRestored } from "./DiffText";
+import { DiffText } from "./DiffText";
 
 interface Props {
   input: string;
@@ -11,7 +11,6 @@ interface Props {
 export function ResultPanel({ input, text, methodLabel }: Props) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
-  const restored = countRestored(input, text);
 
   const copy = async () => {
     await navigator.clipboard.writeText(text);
@@ -34,12 +33,6 @@ export function ResultPanel({ input, text, methodLabel }: Props) {
         output={text}
         className="font-arabic text-3xl leading-[1.9] text-ink"
       />
-      {restored > 0 && (
-        <div className="mt-3 flex items-center gap-1.5 text-[0.7rem] text-muted">
-          <span className="inline-block h-2 w-2 rounded-full bg-accent" />
-          {t.restoredLegend}
-        </div>
-      )}
     </div>
   );
 }

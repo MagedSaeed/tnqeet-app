@@ -12,6 +12,7 @@ export default {
         muted: "rgb(var(--muted) / <alpha-value>)",
         line: "rgb(var(--line) / <alpha-value>)",
         accent: "rgb(var(--accent) / <alpha-value>)",
+        "accent-contrast": "rgb(var(--accent-contrast) / <alpha-value>)",
       },
       fontFamily: {
         // Latin UI first, Amiri as the Arabic fallback so RTL UI stays elegant.

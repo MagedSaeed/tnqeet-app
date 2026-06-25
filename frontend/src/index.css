@@ -12,18 +12,21 @@
   --surface: 252 250 246; /* raised card           */
   --ink: 33 33 42;        /* warm near-black ink    */
   --muted: 112 108 98;    /* warm gray             */
-  --line: 226 220 209;    /* hairline              */
-  --accent: 192 67 43;    /* madder red (the dot)  */
+  --line: 226 220 209;       /* hairline                       */
+  --accent: 168 47 28;       /* deep madder red (the dot)      */
+  --accent-contrast: 255 255 255; /* text/icon ON accent fills */
   color-scheme: light;
 }
 
 .dark {
-  --paper: 21 20 27;
-  --surface: 28 27 36;
-  --ink: 236 231 220;
-  --muted: 156 151 140;
-  --line: 45 44 55;
-  --accent: 224 102 76;
+  /* Warm sepia dark — a cozy "lamp-lit manuscript" feel, not a cold black. */
+  --paper: 36 30 25;         /* warm dark brown-charcoal        */
+  --surface: 47 39 32;       /* warm raised card                */
+  --ink: 230 219 202;        /* soft warm cream (not stark white)*/
+  --muted: 168 156 139;      /* warm gray                       */
+  --line: 61 51 42;          /* warm hairline                   */
+  --accent: 224 126 100;     /* warm coral on the dark ground   */
+  --accent-contrast: 36 30 25; /* dark warm ink reads on accent */
   color-scheme: dark;
 }
 
@@ -40,6 +43,11 @@ body {
 
 ::selection { background: rgb(var(--accent) / 0.22); }
 
+/* Keyboard focus shows an accent outline; mouse/click focus shows none
+   (prevents the browser's default blue outline from clashing with the accent). */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
 *:focus-visible {
   outline: 2px solid rgb(var(--accent));
   outline-offset: 2px;

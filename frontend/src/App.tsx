@@ -10,7 +10,8 @@ import { CompareAll } from "./components/CompareAll";
 import { LlmPanel } from "./components/LlmPanel";
 import { getMethods, removeDots, restoreDots, type MethodInfo } from "./lib/api";
 import { KEYS, loadJSON } from "./lib/storage";
-import { btnPrimary } from "./lib/ui";
+import { btnPrimaryHero } from "./lib/ui";
+import { DotsIcon } from "./components/icons";
 import { EXAMPLES } from "./data/examples";
 
 function Inner() {
@@ -92,32 +93,34 @@ function Inner() {
 
         <section className="mt-8">
           <MethodTabs methods={methods} active={active} onSelect={setActive} />
-          <div className="mt-4 rounded-2xl border border-line bg-surface p-5">
-            {active === "llm" ? (
-              <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
-            ) : (
-              <p className="text-xs leading-relaxed text-muted">
-                {t.modelNote}{" "}
-                <a
-                  className="text-accent underline-offset-2 hover:underline"
-                  href="https://pypi.org/project/tnqeet/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t.packageWord}
-                </a>
-                .
-              </p>
-            )}
 
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button onClick={onRestore} disabled={restoreDisabled} className={btnPrimary}>
-                {t.restore}
-              </button>
-              {active === "llm" && !apiKey && (
-                <span className="text-xs text-muted">{t.enterKeyFirst}</span>
-              )}
+          {active === "llm" ? (
+            <div className="mt-5 rounded-2xl border border-line bg-surface p-5">
+              <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
             </div>
+          ) : (
+            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-muted">
+              {t.modelNote}{" "}
+              <a
+                className="text-muted underline underline-offset-2 hover:text-ink"
+                href="https://pypi.org/project/tnqeet/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t.packageWord}
+              </a>
+              .
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <button onClick={onRestore} disabled={restoreDisabled} className={btnPrimaryHero}>
+              <DotsIcon />
+              {t.restore}
+            </button>
+            {active === "llm" && !apiKey && (
+              <span className="text-xs text-muted">{t.enterKeyFirst}</span>
+            )}
           </div>
         </section>
 

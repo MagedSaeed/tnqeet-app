@@ -24,13 +24,3 @@ export function DiffText({ input, output, className }: Props) {
     </div>
   );
 }
-
-// How many letters `output` restored relative to the dotless `input`.
-export function countRestored(input: string, output: string): number {
-  if (input.length !== output.length) return 0;
-  let n = 0;
-  for (let i = 0; i < output.length; i++) {
-    if (output[i] !== input[i]) n++;
-  }
-  return n;
-}

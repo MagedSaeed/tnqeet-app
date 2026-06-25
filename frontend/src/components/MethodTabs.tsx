@@ -10,7 +10,7 @@ interface Props {
 export function MethodTabs({ methods, active, onSelect }: Props) {
   const { t } = useI18n();
   return (
-    <div className="flex flex-wrap justify-center gap-1 border-b border-line">
+    <div className="flex flex-wrap justify-center gap-2">
       {methods.map((m) => {
         const disabled = !m.available;
         const isActive = m.id === active;
@@ -20,20 +20,18 @@ export function MethodTabs({ methods, active, onSelect }: Props) {
             disabled={disabled}
             onClick={() => onSelect(m.id)}
             title={disabled ? t.unavailable : undefined}
+            aria-pressed={isActive}
             className={[
-              "relative -mb-px rounded-t-lg px-4 py-2.5 font-mono text-[0.8rem] transition",
+              "rounded-full border px-4 py-1.5 font-mono text-[0.8rem] transition",
               isActive
-                ? "font-semibold text-accent"
+                ? "-translate-y-px border-accent bg-accent/20 font-semibold text-accent shadow-[0_2px_9px_-1px_rgb(var(--accent)/0.4)]"
                 : disabled
-                ? "cursor-not-allowed text-muted/40"
-                : "text-muted hover:bg-line/50 hover:text-ink",
+                ? "cursor-not-allowed border-line/60 text-muted/40"
+                : "border-line text-muted shadow-sm hover:-translate-y-px hover:border-accent/50 hover:bg-accent/5 hover:text-ink hover:shadow",
             ].join(" ")}
           >
             {m.label}
             {m.requiresKey && <span className="ms-1 align-text-top text-[0.6rem]">🔒</span>}
-            {isActive && (
-              <span className="absolute inset-x-2 -bottom-px h-[3px] rounded-full bg-accent" />
-            )}
           </button>
         );
       })}

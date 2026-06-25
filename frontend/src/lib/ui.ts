@@ -1,12 +1,21 @@
 // Shared button class strings so every button feels consistent.
 
-// Solid accent action (Restore, Save, Run all). Shadow + hover-darken + press
-// give it depth so it reads as a deliberate control on either background.
-export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 " +
-  "text-sm font-semibold text-white shadow-sm ring-1 ring-black/5 transition " +
-  "hover:-translate-y-px hover:brightness-95 hover:shadow-md active:translate-y-0 active:brightness-90 " +
-  "disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:brightness-100";
+// Solid accent action. A top inner highlight + drop shadow give subtle depth;
+// hover lifts with an accent-colored glow, press settles back. Focus-visible
+// ring for keyboard users.
+const primaryBase =
+  "inline-flex items-center justify-center gap-2 rounded-full bg-accent font-semibold text-accent-contrast transition " +
+  "shadow-[0_1px_2px_rgb(0_0_0/0.18),inset_0_1px_0_rgb(255_255_255/0.18)] " +
+  "hover:-translate-y-px hover:brightness-105 hover:shadow-[0_8px_20px_-6px_rgb(var(--accent)/0.6)] " +
+  "active:translate-y-0 active:brightness-95 " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper " +
+  "disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:brightness-100 disabled:hover:shadow-none";
+
+// Standard primary (Save, Run all).
+export const btnPrimary = `${primaryBase} px-5 py-2.5 text-sm`;
+
+// Hero primary (the main Restore action) — a touch larger.
+export const btnPrimaryHero = `${primaryBase} px-6 py-3 text-base`;
 
 // Quiet bordered action (Remove dots, Show, Edit). Clear accent-tinted hover.
 export const btnGhost =
