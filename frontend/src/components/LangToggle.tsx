@@ -1,26 +1,37 @@
 import { useI18n } from "../i18n";
+import type { Lang } from "../i18n/detect";
 
 export function LangToggle() {
   const { lang, setLang } = useI18n();
-  const cell = "rounded-full px-3.5 py-1 text-sm font-bold leading-none transition";
-  const on = "bg-accent text-accent-contrast shadow";
-  const off = "text-muted/50 hover:text-ink";
+
+  const option = (code: Lang, text: string) => (
+    <button
+      aria-pressed={lang === code}
+      onClick={() => setLang(code)}
+      className={`relative z-10 w-9 rounded-full py-1 text-center text-sm font-bold leading-none transition-colors ${
+        lang === code ? "text-accent-contrast" : "text-muted hover:text-ink"
+      }`}
+    >
+      {text}
+    </button>
+  );
+
   return (
-    <div className="inline-flex items-center gap-0.5 rounded-full border border-line bg-surface p-0.5">
-      <button
-        className={`${cell} ${lang === "en" ? on : off}`}
-        aria-pressed={lang === "en"}
-        onClick={() => setLang("en")}
-      >
-        EN
-      </button>
-      <button
-        className={`${cell} ${lang === "ar" ? on : off}`}
-        aria-pressed={lang === "ar"}
-        onClick={() => setLang("ar")}
-      >
-        ع
-      </button>
+    // Pinned LTR so the sliding indicator stays predictable regardless of UI dir.
+    <div
+      dir="ltr"
+      role="group"
+      aria-label="Language"
+      className="relative inline-flex rounded-full border border-line bg-surface p-0.5"
+    >
+      {/* Sliding accent indicator. */}
+      <span
+        aria-hidden="true"
+        className="absolute bottom-0.5 left-0.5 top-0.5 w-9 rounded-full bg-accent shadow transition-transform duration-200 ease-out"
+        style={{ transform: lang === "ar" ? "translateX(100%)" : "translateX(0)" }}
+      />
+      {option("en", "EN")}
+      {option("ar", "ع")}
     </div>
   );
 }
