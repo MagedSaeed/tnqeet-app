@@ -74,9 +74,11 @@ and a **React frontend** that is clean, intuitive, and nice to look at.
 - **Dev:** Vite dev server serves the frontend and proxies `/api` to FastAPI.
 - **Prod:** the frontend is built to static assets and **served by FastAPI**, so the whole
   app runs as one process / one container.
-- **Python env:** managed with **uv**, pinned to **Python 3.11**. tnqeet requires
-  `>=3.9, <3.13`; 3.11 sits well inside that range with the broadest wheel support across the
-  heavy deps (torch, lightning, transformers, dspy).
+- **Python env:** managed with **uv**, pinned to **Python 3.10**. This is the version
+  suitable for **both** dependencies: tnqeet requires `>=3.9, <3.13`, and **KenLM only builds
+  on ≤3.10** — its checked-in C++ bindings reference the now-opaque `PyFrameObject`, so the
+  compile **fails on Python 3.11+** ([kpu/kenlm#411](https://github.com/kpu/kenlm/issues/411)).
+  3.10 also matches the local dev environment exactly (dev/prod parity).
 - **CPU-only torch:** install torch from the PyTorch **CPU** wheel index
   (`https://download.pytorch.org/whl/cpu`) — no GPU is available locally or on Railway. This
   also avoids the multi-GB CUDA wheels, keeping the image far smaller. Configured via uv's
