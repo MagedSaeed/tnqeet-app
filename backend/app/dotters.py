@@ -85,3 +85,23 @@ def _get_or_load(method_id: str):
         while len(_cache) > config.MAX_RESIDENT_MODELS:
             _cache.popitem(last=False)
         return _cache[method_id]
+
+
+def _make_llm_dotter(api_key: str, model: str):
+    """Construct an OpenRouter LLM dotter. Not cached — key is per-request."""
+    from tnqeet.dotting_models.llms.models import OpenRouterArabicDotter
+    return OpenRouterArabicDotter(api_key=api_key, model=model)
+
+
+def restore(method_id: str, text: str, model: str | None = None,
+            api_key: str | None = None) -> str:
+    """Restore dots to `text` using `method_id`."""
+    if method_id == "llm":
+        if not api_key:
+            raise ValueError("API key required for the LLM method")
+        chosen = model or config.DEFAULT_LLM_MODEL
+        # dspy.configure is process-global inside the dotter; serialize LLM calls.
+        with _lock:
+            dotter = _make_llm_dotter(api_key, chosen)
+            return dotter.restore_dots(text)
+    return _get_or_load(method_id).restore_dots(text)

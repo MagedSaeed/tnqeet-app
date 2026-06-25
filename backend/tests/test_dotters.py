@@ -46,3 +46,36 @@ def test_lru_cache_evicts_oldest_when_over_limit(monkeypatch):
     dotters._get_or_load("canine")
     assert "transformer" not in dotters._cache
     assert set(dotters._cache.keys()) == {"lstm", "canine"}
+
+
+def test_restore_dispatches_to_cached_dotter(monkeypatch):
+    class FakeDotter:
+        def restore_dots(self, text):
+            return text + "_dotted"
+
+    monkeypatch.setattr(dotters, "_get_or_load", lambda m: FakeDotter())
+    assert dotters.restore("lstm", "rasm") == "rasm_dotted"
+
+
+def test_restore_llm_requires_key():
+    import pytest
+
+    with pytest.raises(ValueError, match="API key"):
+        dotters.restore("llm", "rasm", model="x/y", api_key=None)
+
+
+def test_restore_llm_uses_key_and_model(monkeypatch):
+    captured = {}
+
+    class FakeLLM:
+        def __init__(self, api_key=None, model=None):
+            captured["api_key"] = api_key
+            captured["model"] = model
+
+        def restore_dots(self, text):
+            return "ok"
+
+    import app.dotters as d
+    monkeypatch.setattr(d, "_make_llm_dotter", lambda api_key, model: FakeLLM(api_key=api_key, model=model))
+    assert d.restore("llm", "rasm", model="a/b", api_key="sk-or-123") == "ok"
+    assert captured == {"api_key": "sk-or-123", "model": "a/b"}
