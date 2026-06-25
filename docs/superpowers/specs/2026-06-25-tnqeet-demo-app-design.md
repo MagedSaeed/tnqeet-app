@@ -74,7 +74,13 @@ and a **React frontend** that is clean, intuitive, and nice to look at.
 - **Dev:** Vite dev server serves the frontend and proxies `/api` to FastAPI.
 - **Prod:** the frontend is built to static assets and **served by FastAPI**, so the whole
   app runs as one process / one container.
-- **Python env:** managed with **uv**, pinned to **Python 3.10** (matches the tnqeet runtime).
+- **Python env:** managed with **uv**, pinned to **Python 3.11**. tnqeet requires
+  `>=3.9, <3.13`; 3.11 sits well inside that range with the broadest wheel support across the
+  heavy deps (torch, lightning, transformers, dspy).
+- **CPU-only torch:** install torch from the PyTorch **CPU** wheel index
+  (`https://download.pytorch.org/whl/cpu`) — no GPU is available locally or on Railway. This
+  also avoids the multi-GB CUDA wheels, keeping the image far smaller. Configured via uv's
+  index settings in `pyproject.toml`.
 
 ### Backend module layout (proposed)
 ```
@@ -241,7 +247,8 @@ the textbox on click.
 ### Docker
 - **Single production image** (multi-stage):
   1. **Frontend build stage** — Node builds the Vite app to static assets.
-  2. **Python runtime stage** — uv installs backend deps; **compiles KenLM**
+  2. **Python runtime stage** — uv installs backend deps (**torch from the CPU wheel index**,
+     no CUDA); **compiles KenLM**
      (`MAX_ORDER=8 pip install "git+https://github.com/kpu/kenlm.git"`); a `RUN` step
      **downloads the baked weights** (driven by a `BAKED_MODELS` build arg) into the image's
      HF cache dir; copies the built frontend; runs FastAPI (uvicorn).
