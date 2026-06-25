@@ -7,3 +7,5 @@ __pycache__/
 .superpowers/
 .env
 .DS_Store
+*.tsbuildinfo
+uv.lock
