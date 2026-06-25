@@ -1,14 +1,14 @@
 export interface Dict {
-  title: string;
   subtitle: string;
   description: string;
   yourText: string;
   removeDots: string;
-  ruleBased: string;
   restore: string;
   examples: string;
+  moreExamples: string;
   copy: string;
   copied: string;
+  restoredLegend: string;
   compareAll: string;
   runAll: string;
   unavailable: string;
@@ -32,17 +32,17 @@ export interface Dict {
 }
 
 export const en: Dict = {
-  title: "tnqeet",
   subtitle: "Arabic Rasm dot restoration",
   description:
     "Undotted Arabic script (Rasm) is ambiguous — many letters share the same skeleton. tnqeet restores the missing dots. Type your own text or pick an example below, remove its dots, then restore them with any method.",
   yourText: "Your text",
   removeDots: "Remove dots",
-  ruleBased: "rule-based",
   restore: "Restore",
   examples: "Examples",
+  moreExamples: "More examples",
   copy: "Copy",
   copied: "Copied",
+  restoredLegend: "restored letters",
   compareAll: "Compare all methods",
   runAll: "Run all",
   unavailable: "unavailable",

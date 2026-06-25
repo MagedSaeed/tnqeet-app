@@ -1,17 +1,17 @@
 import type { Dict } from "./en";
 
 export const ar: Dict = {
-  title: "تَنقيط",
   subtitle: "استعادة النقاط للرسم العربي",
   description:
     "الرسم العربي غير المنقوط ملتبس؛ إذ تشترك حروف كثيرة في الهيكل نفسه. يعيد tnqeet النقاط المحذوفة. اكتب نصك أو اختر مثالًا في الأسفل، ثم احذف نقاطه واستعدها بأي طريقة.",
   yourText: "النص",
   removeDots: "حذف النقاط",
-  ruleBased: "قائم على قواعد",
   restore: "استعادة",
   examples: "أمثلة",
+  moreExamples: "أمثلة أخرى",
   copy: "نسخ",
   copied: "تم النسخ",
+  restoredLegend: "الحروف المُنقَّطة",
   compareAll: "مقارنة كل الطرق",
   runAll: "تشغيل الكل",
   unavailable: "غير متاح",

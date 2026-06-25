@@ -2,5 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light dark; }
-body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+/* ---- Theme tokens -------------------------------------------------------
+   Palette grounded in the Arabic manuscript world: warm paper / deep ink,
+   with a single madder-red accent drawn from the historical red diacritical
+   dots that scribes added to disambiguate the rasm. RGB channels (space-
+   separated) so Tailwind's `/ <alpha-value>` works. */
+:root {
+  --paper: 246 243 237;   /* warm paper            */
+  --surface: 252 250 246; /* raised card           */
+  --ink: 33 33 42;        /* warm near-black ink    */
+  --muted: 112 108 98;    /* warm gray             */
+  --line: 226 220 209;    /* hairline              */
+  --accent: 192 67 43;    /* madder red (the dot)  */
+  color-scheme: light;
+}
+
+.dark {
+  --paper: 21 20 27;
+  --surface: 28 27 36;
+  --ink: 236 231 220;
+  --muted: 156 151 140;
+  --line: 45 44 55;
+  --accent: 224 102 76;
+  color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
+  font-family: Inter, Amiri, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: rgb(var(--accent) / 0.22); }
+
+*:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Quiet, single entrance for results. */
+.fade-in { animation: fade 0.35s ease both; }
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}

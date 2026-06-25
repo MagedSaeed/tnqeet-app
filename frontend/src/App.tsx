@@ -19,7 +19,7 @@ function Inner() {
   const [methods, setMethods] = useState<MethodInfo[]>([]);
   const [active, setActive] = useState("ngram");
   const [text, setText] = useState(EXAMPLES[0].text);
-  const [result, setResult] = useState<{ text: string; label: string } | null>(null);
+  const [result, setResult] = useState<{ input: string; text: string; label: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,18 +29,21 @@ function Inner() {
   useEffect(() => {
     // Fetch the method catalog once on mount. `t.errorGeneric` is intentionally
     // NOT a dependency — including it would re-fetch on every language switch.
-    getMethods().then((m) => {
-      setMethods(m);
-      const firstAvailable = m.find((x) => x.available);
-      if (firstAvailable) setActive(firstAvailable.id);
-    }).catch(() => setError(t.errorGeneric));
+    getMethods()
+      .then((m) => {
+        setMethods(m);
+        const firstAvailable = m.find((x) => x.available);
+        if (firstAvailable) setActive(firstAvailable.id);
+      })
+      .catch(() => setError(t.errorGeneric));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const activeMethod = methods.find((m) => m.id === active);
 
   const onRemoveDots = async () => {
-    setError(""); setBusy(true);
+    setError("");
+    setBusy(true);
     try {
       const r = await removeDots(text);
       setText(r.text);
@@ -53,15 +56,17 @@ function Inner() {
   };
 
   const onRestore = async () => {
-    setError(""); setBusy(true);
+    setError("");
+    setBusy(true);
+    const sent = text;
     try {
       const r = await restoreDots({
-        text,
+        text: sent,
         method: active,
         model: active === "llm" ? model : undefined,
         apiKey: active === "llm" ? apiKey : undefined,
       });
-      setResult({ text: r.text, label: activeMethod?.label ?? active });
+      setResult({ input: sent, text: r.text, label: activeMethod?.label ?? active });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -72,46 +77,58 @@ function Inner() {
   const restoreDisabled = busy || !text.trim() || (active === "llm" && !apiKey);
 
   return (
-    <div dir={dir} className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <main className="mx-auto max-w-2xl px-5 py-8">
+    <div dir={dir} className="min-h-screen bg-paper text-ink">
+      <main className="mx-auto max-w-2xl px-5 py-12 sm:py-16">
         <Header theme={theme} onToggleTheme={toggle} />
-        <p className="my-4 text-sm leading-relaxed opacity-70">{t.description}</p>
 
-        <TextBox value={text} onChange={setText} onRemoveDots={onRemoveDots} busy={busy} />
+        <p className="mt-6 max-w-prose text-sm leading-relaxed text-muted">{t.description}</p>
+
+        <div className="mt-8">
+          <TextBox value={text} onChange={setText} onRemoveDots={onRemoveDots} busy={busy} />
+        </div>
+
         <Examples onPick={(x) => { setText(x); setResult(null); }} />
 
-        <MethodTabs methods={methods} active={active} onSelect={setActive} />
+        <section className="mt-8">
+          <MethodTabs methods={methods} active={active} onSelect={setActive} />
+          <div className="mt-4 rounded-2xl border border-line bg-surface p-5">
+            {active === "llm" ? (
+              <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
+            ) : (
+              <p className="text-xs leading-relaxed text-muted">
+                {t.modelNote}{" "}
+                <a
+                  className="text-accent underline-offset-2 hover:underline"
+                  href="https://pypi.org/project/tnqeet/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t.packageWord}
+                </a>
+                .
+              </p>
+            )}
 
-        {active === "llm" ? (
-          <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
-        ) : (
-          <div className="rounded-b-xl rounded-tr-xl border border-zinc-300 p-4 dark:border-zinc-700">
-            <button
-              onClick={onRestore}
-              disabled={restoreDisabled}
-              className="rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white disabled:opacity-50"
-            >
-              ✦ {t.restore}
-            </button>
-            <p className="mt-3 text-xs opacity-55">
-              {t.modelNote}{" "}
-              <a className="underline" href="https://pypi.org/project/tnqeet/" target="_blank" rel="noreferrer">{t.packageWord}</a>.
-            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                onClick={onRestore}
+                disabled={restoreDisabled}
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden="true" />
+                {t.restore}
+              </button>
+              {active === "llm" && !apiKey && (
+                <span className="text-xs text-muted">{t.enterKeyFirst}</span>
+              )}
+            </div>
           </div>
-        )}
+        </section>
 
-        {active === "llm" && (
-          <button
-            onClick={onRestore}
-            disabled={restoreDisabled}
-            className="mt-3 rounded-lg bg-indigo-500 px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            ✦ {t.restore}
-          </button>
+        {error && <p className="mt-4 text-sm text-accent">{error}</p>}
+        {result && (
+          <ResultPanel input={result.input} text={result.text} methodLabel={result.label} />
         )}
-
-        {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
-        {result && <div className="mt-3"><ResultPanel text={result.text} methodLabel={result.label} /></div>}
 
         <CompareAll text={text} methods={methods} apiKey={apiKey} model={model} />
       </main>

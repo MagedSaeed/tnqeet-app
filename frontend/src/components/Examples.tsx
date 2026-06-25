@@ -1,41 +1,62 @@
+import { useState } from "react";
 import { useI18n } from "../i18n";
 import { EXAMPLES } from "../data/examples";
 
-function truncate(text: string, n = 60): string {
+function truncate(text: string, n = 66): string {
   return text.length > n ? text.slice(0, n) + "…" : text;
 }
 
 export function Examples({ onPick }: { onPick: (text: string) => void }) {
   const { t } = useI18n();
-  const short = EXAMPLES.filter((e) => !e.isLong);
-  const long = EXAMPLES.filter((e) => e.isLong);
+  const [showMore, setShowMore] = useState(false);
+  const short = EXAMPLES.filter((e) => !e.isLong); // quick chips, always visible
+  const long = EXAMPLES.filter((e) => e.isLong); // longer passages, behind disclosure
+
   return (
-    <div className="my-4">
-      <div className="mb-2 text-xs uppercase tracking-wide opacity-50">{t.examples}</div>
-      <div className="flex flex-wrap gap-2" dir="rtl">
+    <section className="mt-6">
+      <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted">
+        {t.examples}
+      </span>
+      {/* Layout follows the UI direction; each chip's Arabic renders RTL on its own. */}
+      <div className="mt-2.5 flex flex-wrap gap-2">
         {short.map((e) => (
           <button
             key={e.text}
+            dir="rtl"
             onClick={() => onPick(e.text)}
-            className="rounded-full border border-zinc-300 px-3 py-1.5 text-base hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-            title={e.caption}
+            className="rounded-full border border-line bg-surface px-3.5 py-1.5 font-arabic text-xl leading-none text-ink transition hover:border-accent/50"
           >
             {e.text}
           </button>
         ))}
       </div>
-      <div className="mt-2 flex flex-col gap-1.5" dir="rtl">
-        {long.map((e) => (
+
+      {long.length > 0 && (
+        <>
           <button
-            key={e.text}
-            onClick={() => onPick(e.text)}
-            className="truncate rounded-lg border border-zinc-200 px-3 py-2 text-right text-sm hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800"
-            title={e.text}
+            onClick={() => setShowMore((s) => !s)}
+            className="mt-3 text-xs font-medium text-muted transition hover:text-accent"
+            aria-expanded={showMore}
           >
-            {truncate(e.text)}
+            <span className="font-mono">{showMore ? "–" : "+"}</span> {t.moreExamples}
           </button>
-        ))}
-      </div>
-    </div>
+          {showMore && (
+            <div className="mt-2 flex flex-col gap-1.5">
+              {long.map((e) => (
+                <button
+                  key={e.text}
+                  dir="rtl"
+                  onClick={() => onPick(e.text)}
+                  title={e.text}
+                  className="truncate rounded-xl border border-line bg-surface px-4 py-2.5 text-right font-arabic text-lg text-muted transition hover:border-accent/40 hover:text-ink"
+                >
+                  {truncate(e.text)}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </section>
   );
 }

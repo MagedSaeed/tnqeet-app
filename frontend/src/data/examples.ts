@@ -1,9 +1,8 @@
-// Dotted Arabic examples (see spec §8). Short ones render as chips; long ones
-// (isLong) render as a truncated stacked list. `caption` is optional attribution.
+// Dotted Arabic examples. Short ones render as chips; long ones (isLong) render
+// as a truncated stacked list behind a "more examples" disclosure.
 export interface Example {
   text: string;
   isLong: boolean;
-  caption?: string;
 }
 
 export const EXAMPLES: Example[] = [
@@ -30,6 +29,4 @@ export const EXAMPLES: Example[] = [
     text: "النحل حشرات اجتماعية تعيش في مستعمرات منظمة تتألف من ملكة واحدة وآلاف الشغالات وعدد من الذكور، وتشتهر بإنتاج العسل وشمع العسل والغذاء الملكي، وتلعب دورا بالغ الأهمية في تلقيح النباتات المزهرة، مما يسهم في الحفاظ على التنوع البيولوجي وزيادة إنتاج كثير من المحاصيل الزراعية حول العالم، وتتواصل فيما بينها برقصات خاصة تدل على مواقع مصادر الغذاء، ويعد تراجع أعدادها في السنوات الأخيرة مصدر قلق بيئي متزايد لدى العلماء",
     isLong: true,
   },
-  { text: "قم للمعلم وفه التبجيلا، كاد المعلم أن يكون رسولا", isLong: false, caption: "أحمد شوقي" },
-  { text: "الخيل والليل والبيداء تعرفني، والسيف والرمح والقرطاس والقلم", isLong: false, caption: "المتنبي" },
 ];

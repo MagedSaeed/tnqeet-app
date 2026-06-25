@@ -10,7 +10,7 @@ interface Props {
 export function MethodTabs({ methods, active, onSelect }: Props) {
   const { t } = useI18n();
   return (
-    <div className="flex flex-wrap items-end">
+    <div className="flex flex-wrap gap-1 border-b border-line">
       {methods.map((m) => {
         const disabled = !m.available;
         const isActive = m.id === active;
@@ -21,15 +21,19 @@ export function MethodTabs({ methods, active, onSelect }: Props) {
             onClick={() => onSelect(m.id)}
             title={disabled ? t.unavailable : undefined}
             className={[
-              "rounded-t-lg border border-b-0 px-3.5 py-1.5 text-sm",
+              "relative -mb-px px-3.5 py-2.5 font-mono text-[0.8rem] transition",
               isActive
-                ? "border-indigo-500 bg-indigo-500/15 font-semibold"
-                : "border-zinc-300 dark:border-zinc-700",
-              disabled ? "cursor-not-allowed opacity-40" : "opacity-70 hover:opacity-100",
+                ? "text-ink"
+                : disabled
+                ? "cursor-not-allowed text-muted/50"
+                : "text-muted hover:text-ink",
             ].join(" ")}
           >
             {m.label}
-            {m.requiresKey && <span className="ml-1 text-[0.62rem] opacity-70">🔒</span>}
+            {m.requiresKey && <span className="ms-1 align-text-top text-[0.6rem]">🔒</span>}
+            {isActive && (
+              <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-accent" />
+            )}
           </button>
         );
       })}

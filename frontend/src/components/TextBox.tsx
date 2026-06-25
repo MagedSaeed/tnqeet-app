@@ -10,24 +10,26 @@ interface Props {
 export function TextBox({ value, onChange, onRemoveDots, busy }: Props) {
   const { t } = useI18n();
   return (
-    <div>
-      <div className="mb-1.5 flex items-center justify-between">
-        <span className="text-xs uppercase tracking-wide opacity-50">{t.yourText}</span>
+    <section>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted">
+          {t.yourText}
+        </span>
         <button
           onClick={onRemoveDots}
           disabled={busy || !value.trim()}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          className="rounded-full border border-line px-3.5 py-1.5 text-xs text-muted transition hover:border-accent/50 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
         >
-          ✕ {t.removeDots}
-          <span className="text-[0.7rem] opacity-55">({t.ruleBased})</span>
+          {t.removeDots}
         </button>
       </div>
       <textarea
         dir="rtl"
         value={value}
+        rows={3}
         onChange={(e) => onChange(e.target.value)}
-        className="min-h-[80px] w-full rounded-xl border border-zinc-300 bg-transparent p-3 text-xl leading-loose outline-none focus:border-indigo-500 dark:border-zinc-700"
+        className="w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3.5 font-arabic text-3xl leading-[1.9] text-ink outline-none transition focus:border-accent"
       />
-    </div>
+    </section>
   );
 }

@@ -19,7 +19,7 @@ function highlight(text: string, query: string) {
   return (
     <>
       {text.slice(0, i)}
-      <mark className="rounded bg-indigo-400/40 text-inherit">{text.slice(i, i + q.length)}</mark>
+      <mark className="rounded bg-accent/25 text-inherit">{text.slice(i, i + q.length)}</mark>
       {text.slice(i + q.length)}
     </>
   );
@@ -52,11 +52,15 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
   };
   const masked = apiKey ? `${apiKey.slice(0, 6)}…${apiKey.slice(-4)}` : "";
 
+  const label = "mb-1.5 block text-[0.7rem] font-medium uppercase tracking-[0.15em] text-muted";
+  const field =
+    "rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none transition focus:border-accent";
+
   return (
-    <div className="rounded-b-xl rounded-tr-xl border border-zinc-300 p-4 dark:border-zinc-700">
+    <div className="space-y-4">
       {/* API key */}
-      <div className="mb-3">
-        <div className="mb-1 text-xs uppercase tracking-wide opacity-55">{t.llmKeyLabel}</div>
+      <div>
+        <span className={label}>{t.llmKeyLabel}</span>
         {editingKey ? (
           <>
             <div className="flex gap-2">
@@ -65,57 +69,96 @@ export function LlmPanel({ apiKey, model, onChangeKey, onChangeModel }: Props) {
                 value={draftKey}
                 placeholder={t.llmKeyPlaceholder}
                 onChange={(e) => setDraftKey(e.target.value)}
-                className="flex-1 rounded-lg border border-zinc-300 bg-transparent px-3 py-2 font-mono text-sm dark:border-zinc-700"
+                className={`flex-1 font-mono ${field}`}
               />
-              <button onClick={() => setShowKey((s) => !s)} className="rounded-lg border border-zinc-300 px-3 text-sm dark:border-zinc-700">
+              <button
+                onClick={() => setShowKey((s) => !s)}
+                className="rounded-lg border border-line px-3 text-sm text-muted transition hover:text-ink"
+              >
                 {showKey ? t.hide : t.show}
               </button>
-              <button onClick={saveKey} disabled={!draftKey} className="rounded-lg bg-indigo-500 px-3 text-sm text-white disabled:opacity-50">
+              <button
+                onClick={saveKey}
+                disabled={!draftKey}
+                className="rounded-lg bg-accent px-4 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-40"
+              >
                 {t.save}
               </button>
             </div>
-            <p className="mt-1.5 flex gap-1.5 text-xs opacity-60">
-              🔒 <span>{t.llmKeyNote}{" "}
-                <a className="underline" href="https://openrouter.ai/keys" target="_blank" rel="noreferrer">{t.getKey} →</a>
+            <p className="mt-2 flex gap-1.5 text-xs leading-relaxed text-muted">
+              <span aria-hidden="true">🔒</span>
+              <span>
+                {t.llmKeyNote}{" "}
+                <a
+                  className="text-accent underline-offset-2 hover:underline"
+                  href="https://openrouter.ai/keys"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t.getKey} →
+                </a>
               </span>
             </p>
           </>
         ) : (
-          <div className="flex items-center gap-2 text-sm">
-            <span>🔑 <code className="font-mono">{masked}</code></span>
-            <span className="rounded border border-emerald-500 px-1.5 text-[0.68rem] text-emerald-500">{t.inBrowserOnly}</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <code className="font-mono text-muted">{masked}</code>
+            <span className="rounded-full border border-accent/40 px-2 py-0.5 text-[0.66rem] text-accent">
+              {t.inBrowserOnly}
+            </span>
             <span className="flex-1" />
-            <button onClick={() => { setDraftKey(apiKey); setEditingKey(true); }} className="rounded-lg border border-zinc-300 px-2.5 py-1 text-sm dark:border-zinc-700">✎ {t.edit}</button>
-            <button onClick={deleteKey} className="rounded-lg border border-red-400 px-2.5 py-1 text-sm text-red-500">🗑 {t.delete}</button>
+            <button
+              onClick={() => {
+                setDraftKey(apiKey);
+                setEditingKey(true);
+              }}
+              className="rounded-lg border border-line px-3 py-1 text-sm text-muted transition hover:text-ink"
+            >
+              {t.edit}
+            </button>
+            <button
+              onClick={deleteKey}
+              className="rounded-lg border border-accent/50 px-3 py-1 text-sm text-accent transition hover:bg-accent/10"
+            >
+              {t.delete}
+            </button>
           </div>
         )}
       </div>
 
       {/* Model search */}
       <div>
-        <div className="mb-1 text-xs uppercase tracking-wide opacity-55">{t.modelLabel}</div>
+        <span className={label}>{t.modelLabel}</span>
         <input
           value={query}
           placeholder={t.modelPlaceholder}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-lg border border-indigo-500 bg-transparent px-3 py-2 text-sm"
+          className={`w-full ${field} focus:border-accent`}
         />
         {query && (
-          <div className="mt-1.5 max-h-44 overflow-auto rounded-lg border border-zinc-300 dark:border-zinc-700">
+          <div className="mt-1.5 max-h-44 overflow-auto rounded-lg border border-line">
             {filtered.map((m) => (
               <div
                 key={m.id}
-                onClick={() => { saveJSON(KEYS.model, m.id); onChangeModel(m.id); setQuery(""); }}
-                className="flex cursor-pointer justify-between gap-3 px-3 py-2 text-sm hover:bg-indigo-500/10"
+                onClick={() => {
+                  saveJSON(KEYS.model, m.id);
+                  onChangeModel(m.id);
+                  setQuery("");
+                }}
+                className="flex cursor-pointer justify-between gap-3 px-3 py-2 text-sm transition hover:bg-accent/10"
               >
-                <span className="font-mono opacity-85">{highlight(m.id, query)}</span>
-                {m.name && m.name !== m.id && <span className="opacity-50">{highlight(m.name, query)}</span>}
+                <span className="font-mono">{highlight(m.id, query)}</span>
+                {m.name && m.name !== m.id && (
+                  <span className="text-muted">{highlight(m.name, query)}</span>
+                )}
               </div>
             ))}
           </div>
         )}
         {model && (
-          <div className="mt-2 text-sm">{t.selected}: <code className="font-mono">{model}</code></div>
+          <div className="mt-2 text-sm text-muted">
+            {t.selected}: <code className="font-mono text-ink">{model}</code>
+          </div>
         )}
       </div>
     </div>
