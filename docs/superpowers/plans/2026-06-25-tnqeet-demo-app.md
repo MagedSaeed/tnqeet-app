@@ -915,13 +915,13 @@ git commit -m "feat(backend): weight-download script for Docker build"
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^6.0.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.3",
-    "vite": "^5.3.4",
-    "vitest": "^2.0.4"
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9"
   }
 }
 ```
