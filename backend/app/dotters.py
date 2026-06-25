@@ -52,3 +52,36 @@ def is_available(method_id: str) -> bool:
 def catalog():
     """Return the method catalog with per-method availability flags."""
     return [{**m, "available": is_available(m["id"])} for m in METHODS]
+
+
+def _load(method_id: str):
+    """Construct a dotter for `method_id` (heavy: may load weights)."""
+    if method_id == "lstm":
+        from tnqeet.dotting_models.sequence_labeling.models import LSTMDottingModel
+        return LSTMDottingModel.from_pretrained(size=config.BAKED_MODELS["lstm"])
+    if method_id == "transformer":
+        from tnqeet.dotting_models.transformer.models import TransformerDottingModel
+        return TransformerDottingModel.from_pretrained(
+            size=config.BAKED_MODELS["transformer"]
+        )
+    if method_id == "canine":
+        from tnqeet.dotting_models.canine.models import CanineDottingModel
+        return CanineDottingModel.from_pretrained(size=config.BAKED_MODELS["canine"])
+    if method_id == "ngram":
+        from tnqeet.dotting_models.ngrams.models import NgramDotter
+        return NgramDotter.from_pretrained(order=int(config.BAKED_MODELS["ngram"]))
+    raise ValueError(f"unknown method: {method_id!r}")
+
+
+def _get_or_load(method_id: str):
+    """Return a cached dotter, loading + LRU-evicting under lock."""
+    with _lock:
+        if method_id in _cache:
+            _cache.move_to_end(method_id)
+            return _cache[method_id]
+        instance = _load(method_id)
+        _cache[method_id] = instance
+        _cache.move_to_end(method_id)
+        while len(_cache) > config.MAX_RESIDENT_MODELS:
+            _cache.popitem(last=False)
+        return _cache[method_id]
