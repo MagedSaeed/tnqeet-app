@@ -31,7 +31,7 @@ export function ResultPanel({ input, text, methodLabel }: Props) {
       <DiffText
         input={input}
         output={text}
-        className="font-arabic text-3xl leading-[1.9] text-ink"
+        className="font-arabic text-[1.05rem] leading-[1.8] text-ink"
       />
     </div>
   );

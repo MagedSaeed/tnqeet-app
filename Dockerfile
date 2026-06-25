@@ -19,10 +19,7 @@ RUN pip install --no-cache-dir uv
 
 WORKDIR /app/backend
 
-# Install backend deps with CPU-only torch: the PyTorch CPU index +
-# --index-strategy unsafe-best-match (that index also hosts pinned copies of
-# other packages). (tnqeet 0.1.2 has no `[cpu]` extra, so we install plain
-# tnqeet and let the index config deliver the CPU torch build.)
+# CPU-only torch via the PyTorch CPU index (unsafe-best-match per tnqeet docs).
 COPY backend/pyproject.toml ./
 RUN uv venv --python 3.10 \
     && uv pip install fastapi "uvicorn[standard]" pydantic python-dotenv \
@@ -30,17 +27,15 @@ RUN uv venv --python 3.10 \
          --extra-index-url https://download.pytorch.org/whl/cpu \
          --index-strategy unsafe-best-match
 
-# KenLM: compiled from source; MAX_ORDER must cover the baked n-gram order (8).
+# KenLM (n-gram backend), compiled from source; MAX_ORDER=8 covers all orders.
 RUN MAX_ORDER=8 uv pip install "git+https://github.com/kpu/kenlm.git"
 
 # App source.
 COPY backend/ ./
 
-# Download the largest model variants into the image's HF cache (no runtime
-# download). Override the variants via env build args if desired (see app/config.py).
+# Weights download at runtime into HF_HOME — mount a volume there (see README).
 ENV HF_HOME=/app/models
-ARG DOWNLOAD_WEIGHTS=true
-RUN if [ "$DOWNLOAD_WEIGHTS" = "true" ]; then uv run python scripts/download_weights.py; fi
+RUN mkdir -p /app/models
 
 # Bring in the built frontend and point the app at it.
 COPY --from=frontend /fe/dist /app/frontend_dist

@@ -1,5 +1,5 @@
 import { useI18n } from "../i18n";
-import { btnSecondary } from "../lib/ui";
+import { btnPrimary } from "../lib/ui";
 import { RemoveDotsIcon } from "./icons";
 
 interface Props {
@@ -14,10 +14,8 @@ export function TextBox({ value, onChange, onRemoveDots, busy }: Props) {
   return (
     <section>
       <div className="mb-2 flex items-center justify-between gap-3">
-        <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-muted">
-          {t.yourText}
-        </span>
-        <button onClick={onRemoveDots} disabled={busy || !value.trim()} className={btnSecondary}>
+        <span className="text-[0.9rem] font-semibold text-muted">{t.yourText}</span>
+        <button onClick={onRemoveDots} disabled={busy || !value.trim()} className={btnPrimary}>
           <RemoveDotsIcon />
           {t.removeDots}
         </button>
@@ -27,7 +25,7 @@ export function TextBox({ value, onChange, onRemoveDots, busy }: Props) {
         value={value}
         rows={3}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3.5 font-arabic text-3xl leading-[1.9] text-ink outline-none transition focus:border-accent"
+        className="w-full resize-y rounded-2xl border border-line bg-surface px-4 py-3.5 font-arabic text-[1.05rem] leading-[1.8] text-ink outline-none transition focus:border-accent"
       />
     </section>
   );

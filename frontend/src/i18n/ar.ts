@@ -29,7 +29,7 @@ export const ar: Dict = {
   modelPlaceholder: "اكتب لتصفية النماذج…",
   selected: "المُختار",
   enterKeyFirst: "أدخل المفتاح أولًا",
-  modelNote: "يدعم tnqeet أحجامًا/أنواعًا إضافية، حُذفت هنا للأداء والتبسيط. انظر",
+  modelNote: "يدعم tnqeet أحجامًا/أنواعًا إضافية، حُذفت هنا للتبسيط. انظر",
   packageWord: "الحزمة",
   errorGeneric: "حدث خطأ ما. حاول مرة أخرى.",
 };

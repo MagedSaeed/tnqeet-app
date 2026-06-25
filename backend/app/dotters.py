@@ -57,18 +57,18 @@ def catalog():
 def _load(method_id: str):
     """Construct a dotter for `method_id` (heavy: may load weights)."""
     if method_id == "lstm":
-        from tnqeet.dotting_models.sequence_labeling.models import LSTMDottingModel
+        from tnqeet.dotting_models.sequence_labeling.models import LSTMDottingModel # type: ignore
         return LSTMDottingModel.from_pretrained(size=config.BAKED_MODELS["lstm"])
     if method_id == "transformer":
-        from tnqeet.dotting_models.transformer.models import TransformerDottingModel
+        from tnqeet.dotting_models.transformer.models import TransformerDottingModel # type: ignore
         return TransformerDottingModel.from_pretrained(
             size=config.BAKED_MODELS["transformer"]
         )
     if method_id == "canine":
-        from tnqeet.dotting_models.canine.models import CanineDottingModel
+        from tnqeet.dotting_models.canine.models import CanineDottingModel # type: ignore
         return CanineDottingModel.from_pretrained(size=config.BAKED_MODELS["canine"])
     if method_id == "ngram":
-        from tnqeet.dotting_models.ngrams.models import NgramDotter
+        from tnqeet.dotting_models.ngrams.models import NgramDotter # type: ignore
         return NgramDotter.from_pretrained(order=int(config.BAKED_MODELS["ngram"]))
     raise ValueError(f"unknown method: {method_id!r}")
 
@@ -89,13 +89,17 @@ def _get_or_load(method_id: str):
 
 def _make_llm_dotter(api_key: str, model: str):
     """Construct an OpenRouter LLM dotter. Not cached — key is per-request."""
-    from tnqeet.dotting_models.llms.models import OpenRouterArabicDotter
+    from tnqeet.dotting_models.llms.models import OpenRouterArabicDotter # type: ignore
     return OpenRouterArabicDotter(api_key=api_key, model=model)
 
 
 def restore(method_id: str, text: str, model: str | None = None,
             api_key: str | None = None) -> str:
-    """Restore dots to `text` using `method_id`."""
+    """Restore dots to `text` using `method_id`.
+
+    Always undot first, so the model receives dotless rasm.
+    """
+    rasm = remove_dots(text)
     if method_id == "llm":
         if not api_key:
             raise ValueError("API key required for the LLM method")
@@ -103,5 +107,27 @@ def restore(method_id: str, text: str, model: str | None = None,
         # dspy.configure is process-global inside the dotter; serialize LLM calls.
         with _lock:
             dotter = _make_llm_dotter(api_key, chosen)
-            return dotter.restore_dots(text)
-    return _get_or_load(method_id).restore_dots(text)
+            return dotter.restore_dots(rasm)
+    return _get_or_load(method_id).restore_dots(rasm)
+
+
+def ensure_weights() -> None:
+    """Pre-download weight files for available methods into the HF cache.
+
+    Runs at startup. hf_hub_download shows a tqdm progress bar for files it
+    actually downloads; already-cached files are a no-op.
+    """
+    from tnqeet.weights import resolve_weight  # type: ignore
+
+    for method in ("ngram", "lstm", "transformer", "canine"):
+        if not is_available(method):
+            print(f"[weights] {method}: skipped (dependency unavailable)", flush=True)
+            continue
+        size = config.BAKED_MODELS[method]
+        try:
+            print(f"[weights] {method} ({size}): checking…", flush=True)
+            resolve_weight(method, size=int(size) if method == "ngram" else size)
+            print(f"[weights] {method} ({size}): ready", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[weights] {method} ({size}): failed — {exc}", flush=True)
+    print("[weights] prefetch done", flush=True)

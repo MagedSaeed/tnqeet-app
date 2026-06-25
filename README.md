@@ -32,33 +32,42 @@ cd backend && uv run pytest
 cd frontend && npm test
 ```
 
-## Docker (full app, baked weights)
+## Docker
+
+The image does **not** bundle the model weights — they download at runtime into
+`HF_HOME=/app/models`, which you mount as a volume so the image stays small and the
+weights persist (downloaded once, on first use, per method).
 
 ```bash
 docker build -t tnqeet-app .
-docker run --rm -p 8000:8000 tnqeet-app
+# mount a host folder for the weights so they're not re-downloaded each run:
+docker run --rm -p 8000:8000 -v "$(pwd)/docker_volume/models:/app/models" tnqeet-app
 # open http://localhost:8000
 ```
 
-Run via compose (mirrors Railway: the build downloads all weights into the image,
-no volume needed):
+Or via compose (bind-mounts `./docker_volume/models`):
 ```bash
 docker compose up --build
 ```
 
+> First request per method downloads its weight to the volume (slow once, fast after).
+
 ## Deploy to Railway
 
-Railway builds the `Dockerfile` directly (see `railway.toml`). The largest model
-variants are baked into the image, so **no volume is needed** and cold starts do no
-network I/O for weights. Healthcheck path: `/api/health`.
+Railway builds the `Dockerfile` directly (see `railway.toml`). Attach a **volume
+mounted at `/app/models`** (Dashboard → service → Volumes, or
+`railway volume add --mount-path /app/models`); weights download once to the volume
+and persist across deploys, keeping the image small. Healthcheck path: `/api/health`.
+On a small plan, set `TNQEET_MAX_RESIDENT_MODELS=1` to lower peak RAM.
 
 ## Configuration (env vars)
 
 | Var | Default | Meaning |
 |---|---|---|
 | `TNQEET_MAX_INPUT_CHARS` | 8192 | Max input length |
-| `TNQEET_MAX_RESIDENT_MODELS` | 2 | Models kept in memory (LRU) |
-| `TNQEET_LSTM_SIZE` / `TNQEET_TRANSFORMER_SIZE` / `TNQEET_CANINE_SIZE` / `TNQEET_NGRAM_ORDER` | 6L / 12L / c / 8 | Baked model variants |
+| `TNQEET_MAX_RESIDENT_MODELS` | 2 | Models kept resident in RAM (LRU); set 1 for low memory |
+| `TNQEET_LSTM_SIZE` / `TNQEET_TRANSFORMER_SIZE` / `TNQEET_CANINE_SIZE` / `TNQEET_NGRAM_ORDER` | 6L / 12L / c / 8 | Model variant per method (downloaded on first use) |
+| `HF_HOME` | /app/models | Where weights download/cache (mount a volume here) |
 | `TNQEET_DEFAULT_LLM_MODEL` | anthropic/claude-sonnet-4 | LLM default model |
 
 The LLM method needs an OpenRouter API key, entered in the UI and stored **only in your

@@ -4,6 +4,7 @@ import type { MethodInfo } from "../lib/api";
 import { restoreDots } from "../lib/api";
 import { DiffText } from "./DiffText";
 import { btnPrimary } from "../lib/ui";
+import { Spinner } from "./icons";
 
 interface Props {
   text: string;
@@ -63,6 +64,7 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
         </button>
         {open && (
           <button onClick={runAll} disabled={running || !text.trim()} className={btnPrimary}>
+            {running && <Spinner />}
             {t.runAll}
           </button>
         )}
@@ -77,14 +79,14 @@ export function CompareAll({ text, methods, apiKey, model }: Props) {
                   {m.label}
                 </div>
                 {!cell ? (
-                  <div dir="rtl" className="font-arabic text-lg text-muted">
-                    …
+                  <div className="text-muted">
+                    {running ? <Spinner /> : "…"}
                   </div>
                 ) : cell.kind === "ok" ? (
                   <DiffText
                     input={comparedInput}
                     output={cell.value}
-                    className="font-arabic text-lg leading-[1.9] text-ink"
+                    className="font-arabic text-[0.95rem] leading-[1.9] text-ink"
                   />
                 ) : (
                   <div className="text-sm text-muted">{cell.value}</div>

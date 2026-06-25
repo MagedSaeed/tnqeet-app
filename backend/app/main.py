@@ -1,16 +1,28 @@
 """FastAPI application: mounts the API, shapes errors, and (in prod) serves the
 built frontend as a single-page app."""
 import os
+import threading
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config
+from . import config, dotters
 from .api import router
 
-app = FastAPI(title="tnqeet demo")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Pre-download weights in the background so the server is immediately live
+    # (healthchecks pass) while downloads stream progress to the logs.
+    if config.PREFETCH_WEIGHTS:
+        threading.Thread(target=dotters.ensure_weights, name="weights-prefetch", daemon=True).start()
+    yield
+
+
+app = FastAPI(title="tnqeet demo", lifespan=lifespan)
 
 # Dev convenience: the Vite dev server runs on a different origin.
 app.add_middleware(

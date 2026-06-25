@@ -5,7 +5,7 @@ export function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () =>
     <button
       onClick={onToggle}
       aria-label="Toggle theme"
-      className="rounded-full border border-line px-3 py-1.5 text-sm text-muted transition hover:border-accent/50 hover:text-ink"
+      className="rounded-full p-2 text-base leading-none text-muted transition hover:bg-accent/10 hover:text-ink"
     >
       {theme === "dark" ? "☀" : "☾"}
     </button>

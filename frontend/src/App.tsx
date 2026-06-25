@@ -11,7 +11,7 @@ import { LlmPanel } from "./components/LlmPanel";
 import { getMethods, removeDots, restoreDots, type MethodInfo } from "./lib/api";
 import { KEYS, loadJSON } from "./lib/storage";
 import { btnPrimaryHero } from "./lib/ui";
-import { DotsIcon } from "./components/icons";
+import { DotsIcon, Spinner } from "./components/icons";
 import { EXAMPLES } from "./data/examples";
 
 function Inner() {
@@ -23,6 +23,7 @@ function Inner() {
   const [text, setText] = useState(EXAMPLES[0].text);
   const [result, setResult] = useState<{ input: string; text: string; label: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [error, setError] = useState("");
 
   const [apiKey, setApiKey] = useState(loadJSON<string>(KEYS.apiKey, ""));
@@ -60,6 +61,7 @@ function Inner() {
   const onRestore = async () => {
     setError("");
     setBusy(true);
+    setRestoring(true);
     const sent = text;
     try {
       const r = await restoreDots({
@@ -73,6 +75,7 @@ function Inner() {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setRestoring(false);
     }
   };
 
@@ -99,7 +102,7 @@ function Inner() {
               <LlmPanel apiKey={apiKey} model={model} onChangeKey={setApiKey} onChangeModel={setModel} />
             </div>
           ) : (
-            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-muted/80">
+            <p className="mx-auto mt-4 max-w-xl text-center text-xs leading-relaxed text-muted/80">
               {t.modelNote}{" "}
               <a
                 className="text-muted/80 underline underline-offset-2 hover:text-ink"
@@ -115,7 +118,7 @@ function Inner() {
 
           <div className="mt-6 flex flex-col items-center gap-2">
             <button onClick={onRestore} disabled={restoreDisabled} className={btnPrimaryHero}>
-              <DotsIcon />
+              {restoring ? <Spinner /> : <DotsIcon />}
               {t.restore}
             </button>
             {active === "llm" && !apiKey && (

@@ -59,7 +59,7 @@ export const en: Dict = {
   modelPlaceholder: "Type to filter models…",
   selected: "Selected",
   enterKeyFirst: "Enter a key first",
-  modelNote: "tnqeet supports additional sizes/variants — they're omitted here for performance and convenience. See the",
+  modelNote: "tnqeet has more sizes/variants, omitted here for brevity. See the",
   packageWord: "package",
   errorGeneric: "Something went wrong. Please try again.",
 };
