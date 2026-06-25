@@ -112,12 +112,6 @@ dependencies = [
     "uvicorn[standard]>=0.29",
     "pydantic>=2.6",
     "tnqeet==0.1.2",
-    "torch==2.2.2",
-    "pytorch-lightning>=2.2",
-    "transformers>=4.40",
-    "torchmetrics>=1.3",
-    "dspy-ai>=2.4",
-    "huggingface-hub>=0.23",
     "python-dotenv>=1.0",
 ]
 
@@ -127,10 +121,21 @@ dev = [
     "httpx>=0.27",
 ]
 
+# CPU-only torch, following the spirit of tnqeet's official CPU install. The
+# PyTorch CPU index + `index-strategy = "unsafe-best-match"` (required because
+# that index also hosts pinned copies of other packages) makes torch resolve to
+# the CPU build for ALL uv operations (including `uv run`, which re-resolves) and
+# never pull CUDA. tnqeet pulls the neural stack (torch, lightning, transformers,
+# dspy, etc.) itself; with this config torch lands as e.g. 2.12.1+cpu alongside a
+# compatible numpy 2.x (no NumPy ABI warning).
+# NOTE: tnqeet 0.1.2 does NOT publish a `[cpu]` extra on PyPI (uv warns + ignores
+# it), so we depend on plain `tnqeet==0.1.2` and rely on the index config below.
 [tool.uv]
-# torch is pulled from the CPU index (no CUDA) — see Dockerfile / README for the
-# `--index-url https://download.pytorch.org/whl/cpu` install. KenLM is installed
-# separately (compiled from source) because it needs MAX_ORDER at build time.
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
 
 [build-system]
 requires = ["hatchling"]
@@ -150,10 +155,14 @@ Run (from `backend/`):
 ```bash
 cd backend
 uv venv --python 3.10
-uv pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
 uv pip install -e ".[dev]"
 ```
-Expected: installs succeed; `torch` resolves to the `+cpu` build. (KenLM is installed later in Docker; locally it stays absent and the n-gram method simply reports unavailable.)
+The `[tool.uv.sources]` config pins torch to the CPU index, so this installs the
+`+cpu` build (no CUDA) and `numpy<2`. Verify with:
+```bash
+uv run python -c "import torch, numpy; print(torch.__version__, numpy.__version__)"
+```
+Expected: prints something like `2.2.2+cpu 1.26.x` with **no NumPy `_ARRAY_API` warning** and **no CUDA download** triggered by `uv run`. (KenLM is installed later in Docker; locally it stays absent and the n-gram method simply reports unavailable.)
 
 - [ ] **Step 5: Commit**
 
@@ -2250,12 +2259,16 @@ RUN pip install --no-cache-dir uv
 
 WORKDIR /app/backend
 
-# Install backend deps. CPU-only torch first so the resolver never pulls CUDA.
+# Install backend deps with CPU-only torch: the PyTorch CPU index +
+# --index-strategy unsafe-best-match (that index also hosts pinned copies of
+# other packages). (tnqeet 0.1.2 has no `[cpu]` extra, so we install plain
+# tnqeet and let the index config deliver the CPU torch build.)
 COPY backend/pyproject.toml ./
 RUN uv venv --python 3.10 \
-    && uv pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu \
-    && uv pip install fastapi "uvicorn[standard]" pydantic tnqeet==0.1.2 \
-         pytorch-lightning transformers torchmetrics dspy-ai huggingface-hub python-dotenv
+    && uv pip install fastapi "uvicorn[standard]" pydantic python-dotenv \
+         "tnqeet==0.1.2" \
+         --extra-index-url https://download.pytorch.org/whl/cpu \
+         --index-strategy unsafe-best-match
 
 # KenLM: compiled from source; MAX_ORDER must cover the baked n-gram order (8).
 RUN MAX_ORDER=8 uv pip install "git+https://github.com/kpu/kenlm.git"
@@ -2385,10 +2398,10 @@ Backend (Python 3.10, uv):
 ```bash
 cd backend
 uv venv --python 3.10
-uv pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cpu
-uv pip install -e ".[dev]"
+uv pip install -e ".[dev]"   # CPU torch via tnqeet[cpu] + pyproject [tool.uv] index config
 uv run uvicorn app.main:app --port 8000
 ```
+> Follows tnqeet's official CPU install (the `[cpu]` extra + PyTorch CPU index).
 > KenLM is not installed locally, so the n-gram method reports unavailable until you
 > run inside Docker (or `MAX_ORDER=8 uv pip install "git+https://github.com/kpu/kenlm.git"`).
 
