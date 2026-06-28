@@ -23,11 +23,12 @@ ENV HOME=/home/user
 WORKDIR /app/backend
 
 # CPU-only torch via the PyTorch CPU index (unsafe-best-match per tnqeet docs).
+# tnqeet[cpu] (0.1.3+) pulls torch; the CPU index + unsafe-best-match keep it CPU-only.
 # Use the image's python so the venv interpreter is accessible to the user.
 COPY backend/pyproject.toml ./
 RUN uv venv --python /usr/local/bin/python3.10 \
     && uv pip install fastapi "uvicorn[standard]" pydantic python-dotenv \
-         "tnqeet==0.1.2" \
+         "tnqeet[cpu]==0.1.3" \
          --extra-index-url https://download.pytorch.org/whl/cpu \
          --index-strategy unsafe-best-match
 
